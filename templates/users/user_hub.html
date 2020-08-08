@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}{{user.first_name}}{% endblock %}
+
+{% block content %}
+
+  <div class="row justify-content-md-center">
+    <div class="col-12 mb-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, msg in messages %}
+          <div class="flash {{ category }}">{{ msg }}</div>
+      {% endfor %}
+  {% endwith %}
+  </div>
+  <div class="col-md-7 col-lg-5">
+    <h2 class="join-message">Hello {{user.first_name}}</h2>
+    {{session}}
+    <a href="/logout"><button class="btn btn-danger">Logout</button></a>
+   
+  </div>
+</div>
+
+{% endblock %}

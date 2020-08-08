@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="container-fluid">
+        <form class="justify-content-center">
+            <input class="form-control form-control-lg form-control-borderless" type="search" placeholder="Search recipes">
+        </form>
+        <div class="row d-flex align-items-center inner-row">
+            {% for item in saved_recipes %}
+            <div class="col-4 justify-content-center inner-col" style="background: linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url({{item.image}}) no-repeat; background-size: cover; overflow: hidden;">
+                
+            </div>
+            {% endfor %}
+
+            {% for item in created_recipes %}
+            <div class="col-4 justify-content-center inner-col" style="background: linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url({{item.image}}) no-repeat; background-size: cover; overflow: hidden;">
+                
+            </div>
+            {% endfor %}
+        </div>
+       
+    </div>
+  </div>
+<div class="row d-flex align-items-center">
+    <div class="col-12 mb-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, msg in messages %}
+            <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+    {% endwith %}
+    </div>
+</div>
+
+
+{% endblock %}
+

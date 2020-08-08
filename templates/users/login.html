@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+  <div class="row justify-content-md-center">
+    <div class="col-12 mb-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, msg in messages %}
+          <div class="flash {{ category }}">{{ msg }}</div>
+      {% endfor %}
+  {% endwith %}
+  </div>
+    <div class="col-md-7 col-lg-5">
+      <h2 class="join-message">Welcome back</h2>
+
+      <form method="POST" id="user_form">
+        {{ form.hidden_tag() }}
+
+        {% for field in form if field.widget.input_type != 'hidden' %}
+          {% for error in field.errors %}
+            <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+          {{ field(placeholder=field.label.text, class="form-control") }}
+        {% endfor %}
+
+        <button class="btn btn-primary btn-block btn-lg">Log in</button>
+      </form>
+
+      <div>
+        <a href="/register"><p>Not a user? Create an account</p></a>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

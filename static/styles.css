@@ -1,0 +1,197 @@
+/* FLASH MESSAGES STYLING */
+.flash.danger {
+    color: red;
+    text-align: center;
+    padding: 1em;
+    background-color: rgb(242 179 179);
+    border-radius: 3%;
+    border: 1px solid red;
+    width: 60%;
+    margin: 0 auto;
+}
+
+.flash.success {
+    color: green;
+    text-align: center;
+    padding: 1em;
+    background-color: rgb(152, 182, 152);
+    border-radius: 3%;
+    border: 1px solid green;
+    width: 60%;
+    margin: 0 auto;
+}
+
+/* GENERAL */
+body {
+    overflow-x: hidden
+}
+
+/* HEADER JUMBOTRON */
+.homepage .form-control-lg {
+    border-radius: 1.5rem;
+    width: 75%;
+    margin: 0 auto;
+    position: absolute;
+    top: 50vh;
+    left: 10vw;
+    z-index: 5;
+    border: 0.1em solid black;
+    box-shadow: 5px 5px 5px black;
+}
+
+#basic-text1 {
+    position: absolute;
+    top: 50vh;
+    left: 75vw;
+    z-index: 5;
+}
+
+.jumbotron-fluid {
+    height: 90vh;
+    padding: 0;
+}
+
+.jumbotron .container-fluid {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.jumbotron .container-fluid {
+    padding: 0;
+}
+
+#carouselExampleSlidesOnly {
+    height: 100%
+}
+
+.inner-row {
+    height: 100%;
+}
+
+.inner-col {
+    height: 100%;
+}
+
+.carousel-inner {
+    overflow-x: hidden;
+    height: 100%;
+}
+.carousel-item {
+    height: 100%
+}
+
+.carousel-inner .carousel-item.active,
+.carousel-inner .carousel-item-next,
+.carousel-inner .carousel-item-prev {
+  display: flex;
+}
+
+.carousel-inner .carousel-item-right.active,
+.carousel-inner .carousel-item-next {
+  transform: translateX(50%);
+}
+
+.carousel-inner .carousel-item-left.active, 
+.carousel-inner .carousel-item-prev {
+  transform: translateX(-50%);
+}
+  
+.carousel-inner .carousel-item-right,
+.carousel-inner .carousel-item-left{ 
+  transform: translateX(0);
+  
+}
+
+/* RECIPES */
+
+.recipes {
+    padding: 0;
+    margin: 0 auto
+}
+
+.card-image-top {
+    border-bottom: 1px gray solid;
+}
+
+.home.card-title {
+    height: 5.5em
+}
+
+.results.card-title {
+    height: 5.5em
+}
+
+.card-body p {
+    font-size: 0.75rem;
+    text-align: center
+}
+
+.home.card-body {
+    height: 15em
+}
+
+.results.card-body {
+    height: 13em;
+}
+
+/* BROWSE PAGE */
+.browse .form-control-lg {
+    border-radius: 1.5rem;
+    width: 75%;
+    margin: 0 auto;
+    border: 0.1em solid black;
+    box-shadow: 5px 5px 5px black;
+}
+
+
+.results.img-container{
+  position:relative;
+  display:inline-block;
+  height: 11em;
+  border-bottom: 1px solid lightgray;
+}
+
+.img-container{
+    position:relative;
+    display:inline-block;
+    /* border-bottom: 1px solid lightgray; */
+  }
+
+.img-container .overlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgb(0,170,170);
+  opacity:0;
+  transition:opacity 500ms ease-in-out;
+  display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.img-container:hover .overlay{
+  opacity:1;
+}
+.overlay span{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  color:#fff;
+}
+
+.fa-plus-circle:before {
+    font-size: 3rem;
+}
+
+
+/* FOOTER */
+
+footer {
+    background-color: black;
+    color: white;
+    padding: 1em;
+}
