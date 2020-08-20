@@ -4,36 +4,99 @@
 
 {% block content %}
 
-<div class="jumbotron jumbotron-fluid">
     <div class="container-fluid">
-        <form class="justify-content-center">
-            <input class="form-control form-control-lg form-control-borderless" type="search" placeholder="Search recipes">
+        <form class="justify-content-center my-5" name="search" action="/browse" page={{page.page}}>
+            <input class="form-control form-control-lg form-control-borderless" type="text" placeholder="Search recipes" name="search">
+            <input type="hidden" name="page" value="{{page.page}}">
         </form>
+        <ul>
+            {% for cuisine in user.fave_cuisines %}
+            <li>{{cuisine.name}}</li>
+            {% endfor %}
+        </ul>
         <div class="row d-flex align-items-center inner-row">
-            {% for item in saved_recipes %}
-            <div class="col-4 justify-content-center inner-col" style="background: linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url({{item.image}}) no-repeat; background-size: cover; overflow: hidden;">
+            <div class="col-12">
+                <h5>Your Recipes</h5>
+                <div class="row d-flex">
+                    {% for item in savedRecipes %}
+                    <div class="col-12 col-md-3">
+                        <div class="card" style="width: 15rem; margin: 1rem auto">
+                          <div class="img-container">
+                              <img class="card-img-top" src="{{item.image}}" alt="Card image cap">
+                              <div class="overlay text-center">
+                                  <a href="/save_recipe/{{item.id}}"><i data-toggle="tooltip" data-placement="top" title="Save to library" class="fa fa-plus-circle"></i></a>
+                              </div>
+                          </div>                      
+                          <div class="home card-body">
+                              <h6 class="home card-title text-center">{{item.title}}</h6>
+                              <hr/>
+                              <a href="/recipe/{{item.id}}"><p>View recipe details</p></a>
+                              {% if item.cuisines|length  > 0 %}
+                                 <a href="/browse?search={{item.cuisines[0]}}&page={{page.page}}"><p>Browse other {{item.cuisines[0]}} recipes</p></a>
+                              {% endif %}
+                              {% if item.diets|length  == 1 %}
+                                 <a href="/browse?search={{item.diets[0]}}&page={{page.page}}"><p>Browse other {{item.diets[0]}} recipes</p></a>
+                              {% elif item.diets|length  > 1 %}
+                              <a href="/browse?search={{item.diets[1]}}&page={{page.page}}"><p>Browse other {{item.diets[item.diets|length - 1]}} recipes</p></a>
+                              {% endif %}
+                            </div>
+                          </div>
+                      </div>
+                    {% endfor %}
+                </div>
+         
+              </div>
+              <div class="col-12">
+                <h5>Recently Viewed</h5>
+                <div id="carouselExampleSlidesOnly" class="carousel slide">
+                    <div class="carousel-inner w-100" role="listbox">
+                        {% for item in session["recipes"] %} 
+                        {% if item.image %} 
+                        <div class="carousel-item {% if loop.index == 1 %} active{% endif %}">
+                            <div class="col-12 col-md-3">
+                                <div class="card" style="width: 15rem; margin: 1rem auto">
+                                  <div class="img-container">
+                                      <img class="card-img-top" src="{{item.image}}" alt="Card image cap">
+                                      <div class="overlay text-center">
+                                          <a href="/save_recipe/{{item.id}}"><i data-toggle="tooltip" data-placement="top" title="Save to library" class="fa fa-plus-circle"></i></a>
+                                      </div>
+                                  </div>                      
+                                  <div class="home card-body">
+                                      <h6 class="home card-title text-center">{{item.title}}</h6>
+                                      <hr/>
+                                      <a href="/recipe/{{item.id}}"><p>View recipe details</p></a>
+                                      {% if item.cuisines|length  > 0 %}
+                                         <a href="/browse?search={{item.cuisines[0]}}&page={{page.page}}"><p>Browse other {{item.cuisines[0]}} recipes</p></a>
+                                      {% endif %}
+                                      {% if item.diets|length  == 1 %}
+                                         <a href="/browse?search={{item.diets[0]}}&page={{page.page}}"><p>Browse other {{item.diets[0]}} recipes</p></a>
+                                      {% elif item.diets|length  > 1 %}
+                                      <a href="/browse?search={{item.diets[1]}}&page={{page.page}}"><p>Browse other {{item.diets[item.diets|length - 1]}} recipes</p></a>
+                                      {% endif %}
+                                    </div>
+                                  </div>
+                              </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="controls text-center">
+                        <a class="home-icon left" href="#carouselExampleSlidesOnly" role="button" data-slide="prev"> 
+                            <i class="fa fa-arrow-left"></i>
+                          </a> 
+                          <a class="home-icon right" href="#carouselExampleSlidesOnly" role="button" data-slide="next"> 
+                            <i class="fa fa-arrow-right" style="text-align: right;"></i>
+                          </a>
+                    </div>
+                  </div>
+              </div>
+              <div class="col-12">
+                <h5>Recommendations</h5>
                 
-            </div>
-            {% endfor %}
-
-            {% for item in created_recipes %}
-            <div class="col-4 justify-content-center inner-col" style="background: linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url({{item.image}}) no-repeat; background-size: cover; overflow: hidden;">
-                
-            </div>
-            {% endfor %}
+              </div>
         </div>
        
     </div>
-  </div>
-<div class="row d-flex align-items-center">
-    <div class="col-12 mb-3">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, msg in messages %}
-            <div class="flash {{ category }}">{{ msg }}</div>
-        {% endfor %}
-    {% endwith %}
-    </div>
-</div>
 
 
 {% endblock %}

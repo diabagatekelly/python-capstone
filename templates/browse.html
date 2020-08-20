@@ -18,7 +18,7 @@
       </div>
       <div class="row d-flex mt-3 mb-3">
         <div class="col-12 justify-content-start">
-          <p>Results {{(page - 1)* (searchRecipeslength) + 1 }} - {{(searchRecipes|length)*(page)}} of 100</p>
+          <p>Results {{(page - 1)* (searchRecipes|length) + 1 }} - {{(searchRecipes|length)*(page)}} of 100</p>
         </div>
   </div>
       <div class="row d-flex align-items-top mt-5">
@@ -30,7 +30,7 @@
                     <div class="results img-container">
                         <img class="card-img-top" src="{{item.image}}" alt="Card image cap">
                         <div class="overlay text-center">
-                            <i data-toggle="tooltip" data-placement="top" title="Save to library" class="fa fa-plus-circle"></i>
+                          <a href="/save_recipe/{{item.id}}"><i data-toggle="tooltip" data-placement="top" title="Save to library" class="fa fa-plus-circle"></i></a>
                         </div>
                     </div>
                       <div class="results card-body">

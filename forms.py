@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField
-from wtforms.validators import DataRequired, Email, Length
+from wtforms import StringField, PasswordField, TextAreaField, SelectMultipleField, widgets
+from wtforms.validators import DataRequired, Email, Length, Optional
 
 class UserAddForm(FlaskForm):
     """Form for adding users."""
@@ -11,18 +11,31 @@ class UserAddForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[Length(min=6)])
 
+class MultiCheckboxField(SelectMultipleField):
+    widget = widgets.ListWidget(prefix_label=True)
+    option_widget = widgets.CheckboxInput()
+
+class PasswordHidden(PasswordField):
+    widget = widgets.PasswordInput(hide_value=True)
+
 class UserEditForm(FlaskForm):
     """Form for editing users"""
 
-    username = StringField('Username', validators=[DataRequired()])
+    first_name = StringField('First Name', validators=[DataRequired()])
+    last_name = StringField('Last Name', validators=[DataRequired()])
     email = StringField('E-mail', validators=[DataRequired(), Email()])
-    bio = TextAreaField('(Optional) Bio')
-    image_url = StringField('(Optional) Image URL')
-    header_image_url = StringField('(Optional) Header Image URL')
-    password = PasswordField('Password', validators=[Length(min=6)])
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordHidden('Password', validators=[Length(min=6), Optional()])
+    
+
+    fave_cuisines = MultiCheckboxField("Fave Cuisines (Optional)", coerce=int, validators=[Optional()])
+    diets = MultiCheckboxField("Special Diets (Optional)", coerce=int, validators=[Optional()])
+    intolerances = MultiCheckboxField("Foods to avoid (Optional)", coerce=int, validators=[Optional()])
+
 
 class LoginForm(FlaskForm):
     """Login form."""
 
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[Length(min=6)])
+

@@ -4,11 +4,158 @@
 
 {% block content %}
 
-<div class="container-fluid">
+<div class="container-fluid p-5">
     <div class="row d-flex">
-        <div class="col-12">
-            {{recipe}}
+        <div class="col-sm-12 col-md-6">
+            <h1><a href="/save_recipe/{{recipe.id}}"><i style="color: green" data-toggle="tooltip" data-placement="top" title="Save to library" class="fa fa-plus-circle"></i></a>{{recipe.title}}</h1>
+            <h6 class="mt-3"><b>Source: </b><a href="{{recipe.sourceUrl}}" target="_blank"><span>{{recipe.creditsText}}</span></a></h6>
+            <h6 class="mb-2 mt-5"><span><b>Ready In:</b> {{recipe.readyInMinutes}} min.</span> | <span><b>Calories: </b> {{recipe.nutrition.nutrients[0].amount}}</span> </h6>
+            <p class="recipe-summary">{{recipe.summary}}</p>
+            <a href="/save_recipe/{{recipe.id}}" class="btn btn-success">Save to Library</a>
         </div>
+        <div class="col-sm-12 col-md-6">
+            <img src="{{recipe.image}}" class="img-fluid">
+        </div>
+    </div>
+    <hr/>
+    <div class="row d-flex mt-5">
+        <div class="col-12">
+              <ul class="nav nav-pills" id="myTab" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link active" id="ingredients-tab" data-toggle="tab" href="#ingredients" role="tab" aria-controls="ingredients" aria-selected="true">Ingredients</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="directions-tab" data-toggle="tab" href="#directions" role="tab" aria-controls="directions" aria-selected="false">Directions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="nutrition-tab" data-toggle="tab" href="#nutrition" role="tab" aria-controls="nutrition" aria-selected="false">Nutrition</a>
+                  </li>
+              </ul>
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="ingredients" role="tabpanel" aria-labelledby="ingredient-tab">
+                  <div class="container-fluid mt-5">
+                      <div class="row d-flex">
+                          <div class="col-sm-12 col-md-8">
+                              <h2>Ingredients</h2>
+                          </div>
+                          <div class="col-sm-12 col-md-2">
+                            <h6><b>Servings: </b> {{recipe.servings}}</h6>
+                        </div>
+                        <div class="col-sm-12 col-md-2">
+                            <form id="servingMeasure">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="US" checked>
+                                    <label class="form-check-label" for="inlineRadio1">US</label>
+                                  </div>
+                                  <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="Metric">
+                                    <label class="form-check-label" for="inlineRadio2">Metrics</label>
+                                  </div>
+                            </form>
+                        </div>
+                      </div>
+                      <div class="row d-flex">
+                          <div class="col-12">
+                            <ul id="us">
+                                {% for item in recipe.extendedIngredients %}
+                                  <li>{{item.measures.us.amount}} {{item.measures.us.unitShort}} {{item.name}}</li>
+                                {% endfor %}
+                            </ul>
+                            <ul id="metric">
+                                {% for item in recipe.extendedIngredients %}
+                                  <li>{{item.measures.metric.amount}} {{item.measures.metric.unitShort}} {{item.name}}</li>
+                                {% endfor %}
+                            </ul>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="directions" role="tabpanel" aria-labelledby="directions-tab">
+                    <div class="container-fluid mt-5">
+                        <div class="row d-flex">
+                            <div class="col-12">
+                                <h2>Directions</h2>
+                                <div id="recipe-directions">
+                                    {{recipe.instructions}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nutrition" role="tabpanel" aria-labelledby="nutrition-tab">
+                    <div class="container-fluid mt-5">
+                        <div class="row d-flex">
+                            <div class="col-3">
+                                <ul>
+                                    <h6><b>Cuisines:</b></h6> 
+                                    {% if recipe.cuisines| length > 0 %}
+                                    {% for cuisine in recipe.cuisines %}
+                                    <li>{{cuisine}}</li>
+                                    {% endfor %}
+                                    {% else %}
+                                    <p>None listed</p>
+                                    {% endif %}
+
+                                </ul>
+                                <ul>
+                                    <h6><b>Diets:</b></h6> 
+                                    {% if recipe.diets| length > 0 %}
+                                    {% for diet in recipe.diets %}
+                                    <li>{{diet}}</li>
+                                    {% endfor %}
+                                    {% else %}
+                                    <p>None listed</p>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <div class="col-4">
+                                <h6><b>Health Score: </b> {% if recipe.healthScore %}{{recipe.healthScore}}%{%else%} None listed{%endif%}</h6>
+                                <h6><b>Weight Watcher Smartpoints: </b> {% if recipe.weightWatcherSmartPoints %}{{recipe.weightWatcherSmartPoints}} pts{%else%} None listed{%endif%}</h6>
+                            </div>
+                            <div class="col-4">
+                                <div class="row d-flex">
+                                    {% if recipe.dairyFree %}
+                                    <div class="col">
+                                        <div class="badge">Dairy Free <i class="fa fa-check"></i></div>
+                                    </div>
+                                    {%endif%}
+                                    {% if recipe.glutenFree %}
+                                    <div class="col">
+                                        <div class="badge">Gluten Free <i class="fa fa-check"></i></div>
+                                    </div>
+                                    {%endif%}
+                                    {% if recipe.ketogenic %}
+                                    <div class="col">
+                                        <div class="badge">Ketogenic <i class="fa fa-check"></i></div>
+                                    </div>
+                                    {%endif%}
+                                    {% if recipe.vegan %}
+                                    <div class="col">
+                                        <div class="badge">Vegan <i class="fa fa-check"></i></div>
+                                    </div>
+                                    {%endif%}
+                                    {% if recipe.vegetarian %}
+                                    <div class="col">
+                                        <div class="badge">Vegetarian <i class="fa fa-check"></i></div>
+                                    </div>
+                                    {%endif%}
+                                    {% if recipe.whole30 %}
+                                    <div class="col">
+                                        <div class="badge">Whole 30 <i class="fa fa-check"></i></div>
+                                    </div>
+                                    {%endif%}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row d-flex">
+                            {{recipe.nutrition}}
+                        </div>
+                    </div>
+                </div>
+              </div>
+              
+        </div>
+
     </div>
 </div>
 

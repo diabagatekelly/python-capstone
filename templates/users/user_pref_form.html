@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+  <div class="row d-flex align-items-top p-2">
+    <div class="col-12">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, msg in messages %}
+            <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+      {% endwith %}
+        <h2 class="text-center">Hello {{user.first_name}}!</h2>   
+        <h5 class="text-center">Complete your registration by filling out your food preferences now.</h5>
+        <a href="/users/{{user.id}}/hub"><p class="text-center">Skip for now -></p></a>
+    </div>
+    <div class="col-12">
+        <form method="POST" action="/users/{{user.id}}/preferences/edit" id="user_pref" style="width: 75%; margin: 0 auto">
+            {{ form.hidden_tag() }}
+    
+            {% for field in form if field.widget.input_type != 'hidden' and field.widget.input_type != 'password' %}
+              {% for error in field.errors %}
+                <span class="text-danger">{{ error }}</span>
+              {% endfor %}
+              <label style="font-weight: bold; font-size: 16px" for={{field.label.text}}>{{field.label.text}}</label>
+              {{ field(class="form-control mb-3") }}
+            {% endfor %}
+
+            {% for field in form if field.widget.input_type != 'hidden' and field.widget.input_type == 'password' %}
+              {% for error in field.errors %}
+                <span class="text-danger">{{ error }}</span>
+              {% endfor %}
+              <label style="font-weight: bold; font-size: 16px" for={{field.label.text}}>{{field.label.text}}</label>
+              {{ field(class="form-control mb-3", placeholder="Only fill out if you want to change password") }}
+            {% endfor %}
+
+            <button style="width:100%" class="btn btn-primary">Submit</button>
+
+          </form>
+    </div>
+  </div>
+
+{% endblock %}

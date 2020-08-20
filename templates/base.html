@@ -34,8 +34,14 @@
           </li> -->
         </ul>
         <div class="form-inline my-2 my-lg-0">
+          {% if not session.curr_user %}
           <a href="/register"><button class="btn btn-primary btn-sm mr-sm-2">Register</button></a>
           <a href="/login"><button class="btn btn-primary btn-sm my-2 my-sm-0">Login</button></a>
+          {% else %}
+          <a href="/users/{{session['curr_user']}}/preferences"><button class="btn btn-danger btn-sm my-2 my-sm-0 mx-1">My Account</button></a>
+          <a href="/logout"><button class="btn btn-danger btn-sm my-2 my-sm-0 mx-1">Logout</button></a>
+          {% endif %}
+
         </div>
       </div>
     </nav>

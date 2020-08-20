@@ -23,8 +23,10 @@
 
 /* GENERAL */
 body {
-    overflow-x: hidden
+    overflow-x: hidden;
+    height: 100vh
 }
+
 
 /* HEADER JUMBOTRON */
 .homepage .form-control-lg {
@@ -187,6 +189,32 @@ body {
     font-size: 3rem;
 }
 
+
+
+/* RECIPES */
+#metric {
+    display: none;
+}
+
+.badge {
+    border-radius: 5rem;
+    border: 1px solid green;
+    padding: 1em;
+    font-size: 1rem;
+}
+
+/* USER HUB */
+.user_hub {
+    padding: 2em
+}
+
+.fa.fa-cog {
+    font-size: 2.5rem;
+}
+
+#user_pref ul {
+    list-style: none;
+}
 
 /* FOOTER */
 
