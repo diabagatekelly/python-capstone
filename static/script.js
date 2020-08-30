@@ -1,4 +1,4 @@
-$('.carousel .carousel-item').each(function(){
+$('.carousel .carousel-item').each(function() {
       var next = $(this).next();
       if (!next.length) {
       next = $(this).siblings(':first');
@@ -19,10 +19,10 @@ $('.carousel .carousel-item').each(function(){
 
 $recipe_summary = $(".recipe-summary");
 function strip_html_tags_summary(str) {
-   if ((str===null) || (str===''))
+   if ((str===null) || (str==='')) 
        return false;
   else
-   str = str.toString();
+  str = str.toString();
   str.replace(/<[^>]*>/g, '');
   str.replace(/^Summary: $/, '')
   $recipe_summary.empty()

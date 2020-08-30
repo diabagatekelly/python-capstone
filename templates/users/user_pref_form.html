@@ -13,7 +13,9 @@
       {% endwith %}
         <h2 class="text-center">Hello {{user.first_name}}!</h2>   
         <h5 class="text-center">Complete your registration by filling out your food preferences now.</h5>
+        {% if user.new_user == True %}
         <a href="/users/{{user.id}}/hub"><p class="text-center">Skip for now -></p></a>
+        {% endif %}
     </div>
     <div class="col-12">
         <form method="POST" action="/users/{{user.id}}/preferences/edit" id="user_pref" style="width: 75%; margin: 0 auto">

@@ -1,5 +1,6 @@
 from datetime import timedelta
 from flask import Flask, request, render_template, redirect, flash, session, g, jsonify
+from flask_session import Session
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User, CreatedRecipe, SavedRecipe, Cuisine, Diet, Intolerance, FaveSavedRecipes, FaveCreatedRecipes, FaveCuisines, FaveDiets, FoodIntolerances, Saved_Recipe_Cuisine, Saved_Recipe_Diet, Saved_Recipe_Intolerance, Created_Recipe_Cuisine, Created_Recipe_Diet, Created_Recipe_Intolerance
@@ -26,23 +27,28 @@ APIKEY = keys.spoonacular_api_key
 
 app = Flask(__name__)
 
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///recipes'
+app.config['SESSION_TYPE'] = 'filesystem'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = 'kellya-01221990'
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 debug = DebugToolbarExtension(app)
-
 connect_db(app)
+
+sess = Session()
+sess.init_app(app)
+
 
 @app.before_request
 def make_session_permanent():
-    session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=60)
+    SESSION_PERMANENT = True
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 
 def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
-
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
 
@@ -71,12 +77,15 @@ def do_logout():
         del session[NO_RECIPES]
     if "saveRecipe" in session:
         del session["saveRecipe"]
-        
+    if "saved_recipes" in session:
+        del session["saved_recipes"]
+    
 
 @app.route("/")
 def home():
     page = {}
-    if not CURR_USER_KEY in session or not "curr_user" in session:
+
+    if not CURR_USER_KEY in session or not 'curr_user' in session:
 
         recipes = []
 
@@ -103,7 +112,6 @@ def home():
 
                 session["recipes"] = RECIPES
 
-            print(page)
             return render_template("home.html", recipes=recipes, page=page)
 
         elif len(session["recipes"]) > 0:
@@ -111,8 +119,6 @@ def home():
             recipes = session["recipes"]
 
             page["page"] = 1
-
-            print(page)
 
             return render_template("home.html", recipes=recipes, page=page)
         
@@ -124,37 +130,84 @@ def home():
 
         page["page"] = 1
 
-
         saved_recipes = user.saved_recipes
-        for item in saved_recipes:
-            specificRes = requests.get(f"{SPOONACULAR_RECIPES_URL}/{item.api_id}/information", params={"apiKey": APIKEY}).json()
-            savedRecipes.append(specificRes)
+
+        if not 'saved_recipes' in session:
+            print('calling api for saved recipes')
+            for item in saved_recipes:
+                specificRes = requests.get(f"{SPOONACULAR_RECIPES_URL}/{item.api_id}/information", params={"apiKey": APIKEY}).json()
+                savedRecipes.append(specificRes)
+
+            session['saved_recipes'] = savedRecipes
+        elif 'saved_recipes' in session:
+            print('calling session for saved recipes')
+            savedRecipes = session['saved_recipes']
+
 
         created_recipes = user.created_recipes
 
-        return render_template("users/home_logged_in.html", user=user, savedRecipes=savedRecipes, createdRecipes=createdRecipes, page=page )
+        return render_template("users/home_logged_in.html", user=user, savedRecipes=savedRecipes, createdRecipes=createdRecipes, page=page)
 
-# BROWSING FOR NON-USERS
+# BROWSING 
 @app.route("/browse")
 def browse():
     searchRecipes = []
+    totalResults = 0
+
+    user = User.query.get_or_404(session["curr_user"])
 
     offset = OFFSET
 
-    args = request.args.get("search")
+    searchArgs = request.args.get("search")
+
+    intolerances = [i.name for i in user.intolerances]
+    intoleranceString = ' ,'.join(intolerances)
+
+    searchDiets = request.args.getlist('diets')
+    dietString = ' ,'.join(searchDiets)
+
+    searchCuisines = request.args.getlist("cuisines")
+    cuisineString = ' ,'.join(searchCuisines)
+    
+
     page = int(request.args.get("page"))
 
     offset = OFFSET + ((page -1) * 20)
     
 
-    res = requests.get(f"{SPOONACULAR_RECIPES_URL}/complexSearch", params={"offset": offset, "query":{args}, "intolerances":"dairy", "number":20, "apiKey": APIKEY}).json()
+    res = requests.get(f"{SPOONACULAR_RECIPES_URL}/complexSearch", params={"offset": offset, "query":{searchArgs}, "intolerances": {intoleranceString}, "diet":{dietString}, "cuisine":{cuisineString}, "number":20, "sort": "popularity", "apiKey": APIKEY}).json()
+    if not res["results"]:
+        print(res)
+    else:
+        print("EVerything working fine")
 
-    print(res)
-    
     for item in res["results"]:
         searchRecipes.append(item)
+    totalResults = res["totalResults"]
 
-    return render_template("browse.html", searchRecipes=searchRecipes, page=page)
+    return render_template("browse.html", searchRecipes=searchRecipes, page=page, user=user, totalResults=totalResults)
+
+@app.route("/recipe/<int:id>/similar")    
+def similar_recipes(id):
+    searchRecipes = []
+    totalResults = 0
+
+    page = int(request.args.get("page"))
+
+    offset = OFFSET + ((page -1) * 20)
+
+    res = requests.get(f"{SPOONACULAR_RECIPES_URL}/{id}/similar", params={"offset": offset, "number": 20, "apiKey": APIKEY}).json()
+
+    if len(res) == 0 or not res:
+        print(res)
+    else:
+        print('Everything ok')
+
+    searchRecipes = res
+    totalResults = len(res)
+
+    return render_template("browse.html", searchRecipes=searchRecipes, page=page, totalResults=totalResults)
+
 
 @app.route("/recipe/<int:id>")
 def recipe_details(id):
@@ -272,28 +325,26 @@ def logout():
 def user_pref_form(user_id):
     if CURR_USER_KEY in session:
         user = User.query.get_or_404(user_id)
-        if user.new_user == False:
-            return redirect(f'/users/{user.id}/hub')
-        else:
-            exisitingfaveCuisines = FaveCuisines.query.filter_by(user_id=user_id).all()
-            exisitingfaveDiets = FaveDiets.query.filter_by(user_id=user_id).all()
-            exisitingFoodIntolerances = FoodIntolerances.query.filter_by(user_id=user_id).all()
+        exisitingfaveCuisines = FaveCuisines.query.filter_by(user_id=user_id).all()
+        exisitingfaveDiets = FaveDiets.query.filter_by(user_id=user_id).all()
+        exisitingFoodIntolerances = FoodIntolerances.query.filter_by(user_id=user_id).all()
 
-            form = UserEditForm(obj=user)
+        form = UserEditForm(obj=user)
 
-            cuisines = db.session.query(Cuisine.id, Cuisine.name)
-            diets = db.session.query(Diet.id, Diet.name)
-            intolerances = db.session.query(Intolerance.id, Intolerance.name)
+        cuisines = db.session.query(Cuisine.id, Cuisine.name)
+        diets = db.session.query(Diet.id, Diet.name)
+        intolerances = db.session.query(Intolerance.id, Intolerance.name)
 
-            form.fave_cuisines.choices = cuisines
-            form.diets.choices = diets
-            form.intolerances.choices = intolerances
+        form.fave_cuisines.choices = cuisines
+        form.diets.choices = diets
+        form.intolerances.choices = intolerances
 
-            form.fave_cuisines.data = [(c.cuisines_id) for c in exisitingfaveCuisines ]
-            form.diets.data = [(c.diets_id) for c in exisitingfaveDiets ]
-            form.intolerances.data = [(c.intolerances_id) for c in exisitingFoodIntolerances ]
-          
+        form.fave_cuisines.data = [(c.cuisines_id) for c in exisitingfaveCuisines ]
+        form.diets.data = [(c.diets_id) for c in exisitingfaveDiets ]
+        form.intolerances.data = [(c.intolerances_id) for c in exisitingFoodIntolerances ]
+            
         return render_template("users/user_pref_form.html", user=user, form=form)
+
 
 
 @app.route('/users/<int:user_id>/preferences/edit', methods=["POST"])
@@ -392,6 +443,7 @@ def user_hub(user_id):
         flash("You must be logged in to access this page", 'danger')
         return redirect("/login") 
 
+
 @app.route("/save_recipe/<int:id>")
 def save_recipe(id):
     ID = id
@@ -410,10 +462,30 @@ def save_recipe(id):
 
         db.session.commit()
 
+        del session["saved_recipes"]
         flash("You successfully added this recipe to your library", 'success')
 
         return redirect("/")
     else: 
         session["saveRecipe"] = ID
         flash("Log in or Create an Account to save this recipe!", 'danger')
+        return redirect("/login") 
+
+@app.route("/delete_recipe/<int:id>")
+def delete_recipe(id):
+    ID = id
+    if "curr_user" in session:
+        userId= session["curr_user"]
+        recipe = FaveSavedRecipes.query.filter(FaveSavedRecipes.user_id == userId, FaveSavedRecipes.recipes_id == ID).delete()
+
+        db.session.commit()
+        
+        del session["saved_recipes"]
+
+
+        flash("You successfully deleted this recipe from your library", 'success')
+
+        return redirect("/")
+    else: 
+        flash("You must be logged in to do this!", 'danger')
         return redirect("/login") 

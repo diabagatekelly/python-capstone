@@ -3,8 +3,9 @@
   <head>
     <title>{% block title %}TITLE GOES HERE{% endblock %}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="/static/styles.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/styles.css">
+
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -38,7 +39,7 @@
           <a href="/register"><button class="btn btn-primary btn-sm mr-sm-2">Register</button></a>
           <a href="/login"><button class="btn btn-primary btn-sm my-2 my-sm-0">Login</button></a>
           {% else %}
-          <a href="/users/{{session['curr_user']}}/preferences"><button class="btn btn-danger btn-sm my-2 my-sm-0 mx-1">My Account</button></a>
+          <a href="/users/{{session['curr_user']}}/hub"><button class="btn btn-danger btn-sm my-2 my-sm-0 mx-1">My Account</button></a>
           <a href="/logout"><button class="btn btn-danger btn-sm my-2 my-sm-0 mx-1">Logout</button></a>
           {% endif %}
 

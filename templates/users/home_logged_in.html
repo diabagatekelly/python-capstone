@@ -5,15 +5,45 @@
 {% block content %}
 
     <div class="container-fluid">
-        <form class="justify-content-center my-5" name="search" action="/browse" page={{page.page}}>
-            <input class="form-control form-control-lg form-control-borderless" type="text" placeholder="Search recipes" name="search">
+        <div class="row">
+            <div class="col-12 mb-3">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, msg in messages %}
+                    <div class="flash {{ category }}">{{ msg }}</div>
+                {% endfor %}
+            {% endwith %}
+            </div>
+        </div>
+        <form class="justify-content-center my-5" action="/browse" page={{page.page}}>
+            <input class="form-control form-control-lg form-control-borderless mb-3" type="text" placeholder="Search recipes" name="search">
             <input type="hidden" name="page" value="{{page.page}}">
+            <div class="row d-flex">
+                <div class="col-sm-12 col-md-4">
+                    <!-- <div class="form-group"> -->
+                        <h6>Refine your search by your fave cuisine(s)</h6>
+                        {% for cuisine in user.fave_cuisines %}
+                        <input type="checkbox" id="{{cuisine.name}}" name="cuisines" value="{{cuisine.name}}">
+                        <label for="{{cuisine.name}}">{{cuisine.name}}</label><br>
+                        {% endfor %}
+                    <!-- </div> -->
+                </div>
+                <div class="col-sm-12 col-md-4">
+                    <!-- <div class="form-group"> -->
+                        <h6>Refine your search by your specified diet(s)</h6>
+                        {% for diet in user.diets %}
+                        <input type="checkbox" id="{{diet.name}}" name="diets" value="{{diet.name}}">
+                        <label for="{{diet.name}}">{{diet.name}}</label><br>
+                        {% endfor %}
+                       <!-- </div> -->
+                </div>
+            </div>
+            <a href="/users/{{user.id}}/preferences"><p>Click here to update your fave cuisines and preferred diets</p></a>
+
+            <button style="width:100%" class="btn btn-primary">Submit</button>
+    
         </form>
-        <ul>
-            {% for cuisine in user.fave_cuisines %}
-            <li>{{cuisine.name}}</li>
-            {% endfor %}
-        </ul>
+            
+        
         <div class="row d-flex align-items-center inner-row">
             <div class="col-12">
                 <h5>Your Recipes</h5>
@@ -23,22 +53,15 @@
                         <div class="card" style="width: 15rem; margin: 1rem auto">
                           <div class="img-container">
                               <img class="card-img-top" src="{{item.image}}" alt="Card image cap">
-                              <div class="overlay text-center">
-                                  <a href="/save_recipe/{{item.id}}"><i data-toggle="tooltip" data-placement="top" title="Save to library" class="fa fa-plus-circle"></i></a>
+                              <div class="overlay minus text-center">
+                                  <a href="/delete_recipe/{{item.id}}"><i data-toggle="tooltip" data-placement="top" title="Delete from library" class="fa fa-minus-circle"></i></a>
                               </div>
                           </div>                      
                           <div class="home card-body">
                               <h6 class="home card-title text-center">{{item.title}}</h6>
                               <hr/>
-                              <a href="/recipe/{{item.id}}"><p>View recipe details</p></a>
-                              {% if item.cuisines|length  > 0 %}
-                                 <a href="/browse?search={{item.cuisines[0]}}&page={{page.page}}"><p>Browse other {{item.cuisines[0]}} recipes</p></a>
-                              {% endif %}
-                              {% if item.diets|length  == 1 %}
-                                 <a href="/browse?search={{item.diets[0]}}&page={{page.page}}"><p>Browse other {{item.diets[0]}} recipes</p></a>
-                              {% elif item.diets|length  > 1 %}
-                              <a href="/browse?search={{item.diets[1]}}&page={{page.page}}"><p>Browse other {{item.diets[item.diets|length - 1]}} recipes</p></a>
-                              {% endif %}
+                              <a href="/recipe/{{item.id}}"><p>View recipe details</p></a>                           
+                              <a href="/recipe/{{item.id}}/similar?page={{page.page}}"><p>Browse similar recipes</p></a>
                             </div>
                           </div>
                       </div>
@@ -92,6 +115,12 @@
               </div>
               <div class="col-12">
                 <h5>Recommendations</h5>
+                {% for cuisine in user.fave_cuisines %}
+                <a href="/browse?cuisines={{cuisine.name}}&page={{page.page}}"><button class="btn btn-primary btn-sm">Explore {{cuisine.name}} Cuisine</button></a>
+                {% endfor %}
+                {% for diet in user.diets %}
+                <a href="/browse?diets={{diet.name}}&page={{page.page}}"><button class="btn btn-success btn-sm">Explore {{diet.name}} Recipes</button></a>
+                {% endfor %}
                 
               </div>
         </div>
