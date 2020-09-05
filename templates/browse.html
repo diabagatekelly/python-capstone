@@ -66,64 +66,10 @@
               </li>
               {% endif %}
 
-              {% for i in range(1, (totalResults / 20)|round|int + 1)[page-1:page+9] %}
+              {% for i in range(1, (totalResults / 20)|round(0, 'ceil')|int + 1)[page-1:page+9] %}
               <li class="page-item {% if page == i %}active{% endif %}"><a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{i}}">{{i}}</a></li>
               {% endfor %}
 
-              <!-- {% if page < 11 %}
-              {% for i in range((totalResults/20)|round|int + 1)[1:11] %}
-              <li class="page-item {% if page == i %}active{% endif %}"><a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{i}}">{{i}}</a></li>
-              {%endfor%}
-
-              {% elif page > 10 and page < 21 %}
-              {% for i in range((totalResults/20)|round|int + 1)[11:21] %}
-              <li class="page-item {% if page == i %}active{% endif %}"><a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{i}}">{{i}}</a></li>
-              {%endfor%}
-
-              {% elif page > 20 and page < 31 %}
-              {% for i in range((totalResults/20)|round|int + 1)[21:31] %}
-              <li class="page-item {% if page == i %}active{% endif %}"><a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{i}}">{{i}}</a></li>
-              {%endfor%}
-
-              {% elif page > 30 and page < 41 %}
-              {% for i in range((totalResults/20)|round|int + 1)[31:41] %}
-              <li class="page-item {% if page == i %}active{% endif %}"><a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{i}}">{{i}}</a></li>
-              {%endfor%}
-
-              {% elif page > 40 and page < 51 %}
-              {% for i in range((totalResults/20)|round|int + 1)[41:51] %}
-              <li class="page-item {% if page == i %}active{% endif %}"><a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{i}}">{{i}}</a></li>
-              {%endfor%}
-
-              {% elif page > 50 and page < 61 %}
-              {% for i in range((totalResults/20)|round|int + 1)[51:61] %}
-              <li class="page-item {% if page == i %}active{% endif %}"><a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{i}}">{{i}}</a></li>
-              {%endfor%}
-
-              {% elif page > 60 and page < 71 %}
-              {% for i in range((totalResults/20)|round|int + 1)[61:71] %}
-              <li class="page-item {% if page == i %}active{% endif %}"><a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{i}}">{{i}}</a></li>
-              {%endfor%}
-
-              {% elif page > 70 and page < 81 %}
-              {% for i in range((totalResults/20)|round|int + 1)[71:81] %}
-              <li class="page-item {% if page == i %}active{% endif %}"><a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{i}}">{{i}}</a></li>
-              {%endfor%}
-
-              {% elif page > 80 and page < 91 %}
-              {% for i in range((totalResults/20)|round|int + 1)[81:91] %}
-              <li class="page-item {% if page == i %}active{% endif %}"><a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{i}}">{{i}}</a></li>
-              {%endfor%}
-
-              {% elif page > 90 and page < 101 %}
-              {% for i in range((totalResults/20)|round|int + 1)[91:101] %}
-              <li class="page-item {% if page == i %}active{% endif %}"><a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{i}}">{{i}}</a></li>
-              {%endfor%}
-
-              {%endif%} -->
-
-
- 
               {% if page != (totalResults/20)|round|int %}
               <li class="page-item ">
                 <a class="page-link" href="/browse?search={{request.args["search"]}}&diets={{request.args["diets"]}}&cuisines={{request.args["cuisines"]}}&page={{page + 1}}" aria-label="Next">

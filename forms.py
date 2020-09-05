@@ -31,6 +31,7 @@ class UserEditForm(FlaskForm):
     fave_cuisines = MultiCheckboxField("Fave Cuisines (Optional)", coerce=int, validators=[Optional()])
     diets = MultiCheckboxField("Special Diets (Optional)", coerce=int, validators=[Optional()])
     intolerances = MultiCheckboxField("Foods to avoid (Optional)", coerce=int, validators=[Optional()])
+    displayCustoms = MultiCheckboxField("Custom (Optional)", coerce=int, validators=[Optional()])
 
 
 class LoginForm(FlaskForm):

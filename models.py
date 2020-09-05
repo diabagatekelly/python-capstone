@@ -38,6 +38,15 @@ class User(db.Model):
     fave_cuisines = db.relationship('Cuisine', secondary="user_fave_cuisines")
     diets = db.relationship('Diet', secondary="user_diets")
     intolerances = db.relationship('Intolerance', secondary="user_food_intolerances")
+    custom_tags = db.relationship('CustomTag', secondary="user_custom_tags")
+
+    created_recipes_cuisine_tags = db.relationship('Cuisine', secondary="user_created_recipes_cuisine")
+    saved_recipes_cuisine_tags = db.relationship('Cuisine', secondary="user_saved_recipes_cuisine")
+    created_recipes_diet_tags = db.relationship('Diet', secondary="user_created_recipes_diet")
+    saved_recipes_diet_tags = db.relationship('Diet', secondary="user_saved_recipes_diet")
+    created_recipes_custom_tags = db.relationship('CustomTag', secondary="user_created_recipes_custom")
+    saved_recipes_custom_tags = db.relationship('CustomTag', secondary="user_saved_recipes_custom")
+
 
 
     # start_register
@@ -87,11 +96,9 @@ class SavedRecipe(db.Model):
     
     user_saved_recipes = db.relationship('User', secondary="user_fave_saved_recipes")
 
-    linked_cuisines = db.relationship('Cuisine', secondary="saved_recipe_cuisine")
-
-    linked_diets = db.relationship('Diet', secondary="saved_recipe_diet")
-
-    linked_intolerances = db.relationship('Intolerance', secondary="saved_recipe_intolerance")
+    saved_recipes_linked_cuisine = db.relationship('Cuisine', secondary="user_saved_recipes_cuisine")
+    saved_recipes_linked_diet = db.relationship('Diet', secondary="user_saved_recipes_diet")
+    saved_recipes_linked_custom = db.relationship('CustomTag', secondary="user_saved_recipes_custom")
 
 
 
@@ -109,13 +116,26 @@ class CreatedRecipe(db.Model):
     
     user_created_recipes = db.relationship('User', secondary="user_fave_created_recipes")
 
-    linked_cuisines = db.relationship('Cuisine', secondary="created_recipe_cuisine")
-
-    linked_diets = db.relationship('Diet', secondary="created_recipe_diet")
-
-    linked_intolerances = db.relationship('Intolerance', secondary="created_recipe_intolerance")
+    created_recipes_linked_cuisine = db.relationship('Cuisine', secondary="user_created_recipes_cuisine")
+    created_recipes_linked_diet = db.relationship('Diet', secondary="user_created_recipes_diet")
+    created_recipes_linked_custom = db.relationship('CustomTag', secondary="user_created_recipes_custom")
 
 
+class CustomTag(db.Model):
+    """Custom Tag"""
+
+    __tablename__="custom_tags"
+
+    id = db.Column(db.Integer, 
+                    primary_key=True,
+                    autoincrement=True)
+    name = db.Column(db.Text, 
+                        nullable=False)
+    
+    user = db.relationship('User', secondary="user_custom_tags")
+
+    linked_saved_recipe = db.relationship('SavedRecipe', secondary="user_saved_recipes_custom")
+    linked_created_recipe = db.relationship('CreatedRecipe', secondary="user_created_recipes_custom")
 
 class Cuisine(db.Model):
     """Cuisine"""
@@ -130,8 +150,8 @@ class Cuisine(db.Model):
     
     user = db.relationship('User', secondary="user_fave_cuisines")
 
-    linked_saved_recipe = db.relationship('SavedRecipe', secondary="saved_recipe_cuisine")
-    linked_created_recipe = db.relationship('CreatedRecipe', secondary="created_recipe_cuisine")
+    linked_saved_recipe = db.relationship('SavedRecipe', secondary="user_saved_recipes_cuisine")
+    linked_created_recipe = db.relationship('CreatedRecipe', secondary="user_created_recipes_cuisine")
     
 
 class Diet(db.Model):
@@ -147,12 +167,8 @@ class Diet(db.Model):
     
     user = db.relationship('User', secondary="user_diets")
 
-    linked_saved_recipe = db.relationship('SavedRecipe', secondary="saved_recipe_diet")
-    linked_created_recipe = db.relationship('CreatedRecipe', secondary="created_recipe_diet")
-
-
-    
-
+    linked_saved_recipe = db.relationship('SavedRecipe', secondary="user_saved_recipes_diet")
+    linked_created_recipe = db.relationship('CreatedRecipe', secondary="user_created_recipes_diet")
 
 
 class Intolerance(db.Model):
@@ -167,11 +183,6 @@ class Intolerance(db.Model):
                         nullable=False)
 
     user = db.relationship('User', secondary="user_food_intolerances")
-
-    linked_saved_recipe = db.relationship('SavedRecipe', secondary="saved_recipe_intolerance")
-    linked_created_recipe = db.relationship('CreatedRecipe', secondary="created_recipe_intolerance")
-
-
 
 
 # HELPER TABLES - USER
@@ -196,6 +207,14 @@ class FaveCreatedRecipes(db.Model):
     # user = db.relationship(User, backref=db.backref("user_fave_recipes", cascade="all, delete-orphan"))
     # recipe = db.relationship(Recipe, backref=db.backref("user_fave_recipes", cascade="all, delete-orphan"))
 
+class UserCustomTags(db.Model):
+    __tablename__ = 'user_custom_tags'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
+    custom_id = db.Column(db.Integer, db.ForeignKey('custom_tags.id', ondelete="CASCADE"))
+
+
 class FaveCuisines(db.Model):
     __tablename__ = 'user_fave_cuisines'
 
@@ -210,8 +229,8 @@ class FaveDiets(db.Model):
     __tablename__ = 'user_diets'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    diets_id = db.Column(db.Integer, db.ForeignKey('diets.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
+    diets_id = db.Column(db.Integer, db.ForeignKey('diets.id', ondelete="CASCADE"))
 
     # user = db.relationship(User, backref=db.backref("user_diets", cascade="all, delete-orphan"))
     # diet = db.relationship(Diet, backref=db.backref("user_diets", cascade="all, delete-orphan"))
@@ -220,8 +239,8 @@ class FoodIntolerances(db.Model):
     __tablename__ = 'user_food_intolerances'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    intolerances_id = db.Column(db.Integer, db.ForeignKey('intolerances.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"))
+    intolerances_id = db.Column(db.Integer, db.ForeignKey('intolerances.id', ondelete="CASCADE"))
 
     # user = db.relationship(User, backref=db.backref("user_food_intolerances", cascade="all, delete-orphan"))
     # intolerance = db.relationship(Intolerance, backref=db.backref("user_food_intolerances", cascade="all, delete-orphan"))
@@ -229,13 +248,34 @@ class FoodIntolerances(db.Model):
 
 #HELPER TABLES - RECIPES
 
+class UserSavedRecipesCustom(db.Model):
+    """Recipe_Custom Link"""
 
-class Saved_Recipe_Cuisine(db.Model):
-    """Recipe_Cuisine Link"""
-
-    __tablename__="saved_recipe_cuisine"
+    __tablename__ = "user_saved_recipes_custom"
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    recipe_id = db.Column(db.Integer, db.ForeignKey('saved_recipes.id'))
+    custom_id = db.Column(db.Integer, db.ForeignKey('custom_tags.id'))
+
+class UserCreatedRecipesCustom(db.Model):
+    """Recipe_Cuisine Link"""
+
+    __tablename__="user_created_recipes_custom"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    recipe_id = db.Column(db.Integer, db.ForeignKey('created_recipes.id'))
+    custom_id = db.Column(db.Integer, db.ForeignKey('custom_tags.id'))
+
+
+class UserSavedRecipesCuisine(db.Model):
+    """Recipe_Cuisine Link"""
+
+    __tablename__="user_saved_recipes_cuisine"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     recipe_id = db.Column(db.Integer, db.ForeignKey('saved_recipes.id'))
     cuisine_id = db.Column(db.Integer, db.ForeignKey('cuisines.id'))
 
@@ -243,65 +283,45 @@ class Saved_Recipe_Cuisine(db.Model):
     # cuisine = db.relationship(Cuisine, backref=db.backref("saved_recipe_cuisine", cascade="all, delete-orphan"))
 
 
-class Created_Recipe_Cuisine(db.Model):
+class UserCreatedRecipesCuisine(db.Model):
     """Recipe_Cuisine Link"""
 
-    __tablename__="created_recipe_cuisine"
+    __tablename__="user_created_recipes_cuisine"
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     recipe_id = db.Column(db.Integer, db.ForeignKey('created_recipes.id'))
     cuisine_id = db.Column(db.Integer, db.ForeignKey('cuisines.id'))
 
     # recipe = db.relationship(CreatedRecipe, backref=db.backref("created_recipe_cuisine", cascade="all, delete-orphan"))
     # cuisine = db.relationship(Cuisine, backref=db.backref("created_recipe_cuisine", cascade="all, delete-orphan"))
 
-class Saved_Recipe_Diet(db.Model):
+class UserSavedRecipesDiet(db.Model):
     """Recipe_Diet Link"""
 
-    __tablename__="saved_recipe_diet"
+    __tablename__="user_saved_recipes_diet"
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     recipe_id = db.Column(db.Integer, db.ForeignKey('saved_recipes.id'))
     diet_id = db.Column(db.Integer, db.ForeignKey('diets.id'))
 
     # saved_recipe = db.relationship(SavedRecipe, backref=db.backref("saved_recipe_diet", cascade="all, delete-orphan"))
     # diet = db.relationship(Diet, backref=db.backref("saved_recipe_diet", cascade="all, delete-orphan"))
 
-class Created_Recipe_Diet(db.Model):
+class UserCreatedRecipesDiet(db.Model):
     """Recipe_Diet Link"""
 
-    __tablename__="created_recipe_diet"
+    __tablename__="user_created_recipes_diet"
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     recipe_id = db.Column(db.Integer, db.ForeignKey('created_recipes.id'))
     diet_id = db.Column(db.Integer, db.ForeignKey('diets.id'))
 
     # recipe = db.relationship(CreatedRecipe, backref=db.backref("created_recipe_diet", cascade="all, delete-orphan"))
     # diet = db.relationship(Diet, backref=db.backref("created_recipe_diet", cascade="all, delete-orphan"))
 
-class Saved_Recipe_Intolerance(db.Model):
-    """Recipe_Intolerance Link"""
-
-    __tablename__="saved_recipe_intolerance"
-
-    id = db.Column(db.Integer, primary_key=True)
-    recipe_id = db.Column(db.Integer, db.ForeignKey('saved_recipes.id'))
-    intolerance_id = db.Column(db.Integer, db.ForeignKey('intolerances.id'))
-
-    # recipe = db.relationship(SavedRecipe, backref=db.backref("saved_recipe_intolerance", cascade="all, delete-orphan"))
-    # intolerance = db.relationship(Intolerance, backref=db.backref("saved_recipe_intolerance", cascade="all, delete-orphan"))
-
-class Created_Recipe_Intolerance(db.Model):
-    """Recipe_Intolerance Link"""
-
-    __tablename__="created_recipe_intolerance"
-
-    id = db.Column(db.Integer, primary_key=True)
-    recipe_id = db.Column(db.Integer, db.ForeignKey('created_recipes.id'))
-    intolerance_id = db.Column(db.Integer, db.ForeignKey('intolerances.id'))
-
-    # recipe = db.relationship(CreatedRecipe, backref=db.backref("created_recipe_intolerance", cascade="all, delete-orphan"))
-    # intolerance = db.relationship(Intolerance, backref=db.backref("created_recipe_intolerance", cascade="all, delete-orphan"))
 
 def connect_db(app):
     """Connect this database to provided Flask app.

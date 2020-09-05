@@ -3,44 +3,66 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-
-  <div class="row d-flex align-items-top p-2">
-    <div class="col-12">
+<div class="row d-flex align-items-center hub-header">
+  <div class="col-12">
+    <div class="jumbotron jumbotron-fluid align-items-center">
+      <div class="container">
+        <h1 class="display-4 text-center">Hello, {{user.first_name}}!</h1>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="row d-flex align-items-top user_hub">
+    <div class="col-2">
+      <div class="nav flex-column nav-tabs" id="user-hub-tab" role="tablist" aria-orientation="vertical">
+        <a class="nav-link"  href="/users/{{user.id}}/hub" role="tab" aria-controls="recently-saved" aria-selected="false">Recently Saved</a>
+        <a class="nav-link active" data-toggle="tab" id="edit-prefs-tab" href="#edit-prefs" role="tab" aria-controls="edit-prefs" aria-selected="true">Edit Search Preferences</a>
+        <a class="nav-link" href="/users/{{user.id}}/library" role="tab" aria-controls="library" aria-selected="false">View Full Library</a>
+      </div>
+    </div>
+    <div class="col-10 pt-5">
+      <div class="tab-content" id="user-hub-tab">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, msg in messages %}
             <div class="flash {{ category }}">{{ msg }}</div>
         {% endfor %}
       {% endwith %}
-        <h2 class="text-center">Hello {{user.first_name}}!</h2>   
+      <div class="tab-pane active" id="edit-prefs" role="tabpanel" aria-labelledby="edit-prefs-tab">
         <h5 class="text-center">Complete your registration by filling out your food preferences now.</h5>
         {% if user.new_user == True %}
         <a href="/users/{{user.id}}/hub"><p class="text-center">Skip for now -></p></a>
         {% endif %}
-    </div>
-    <div class="col-12">
-        <form method="POST" action="/users/{{user.id}}/preferences/edit" id="user_pref" style="width: 75%; margin: 0 auto">
-            {{ form.hidden_tag() }}
-    
-            {% for field in form if field.widget.input_type != 'hidden' and field.widget.input_type != 'password' %}
-              {% for error in field.errors %}
-                <span class="text-danger">{{ error }}</span>
-              {% endfor %}
-              <label style="font-weight: bold; font-size: 16px" for={{field.label.text}}>{{field.label.text}}</label>
-              {{ field(class="form-control mb-3") }}
+      <form method="POST" action="/users/{{user.id}}/preferences/edit" id="user_pref" style="width: 75%; margin: 0 auto">
+          {{ form.hidden_tag() }}
+
+          {% for field in form if field.widget.input_type != 'hidden' and field.widget.input_type != 'password' and field.id !='displayCustoms' %}
+          {% for error in field.errors %}
+              <span class="text-danger">{{ error }}</span>
             {% endfor %}
+            {% if field is not none %}
+            <label style="font-weight: bold; font-size: 16px" for={{field.label.text}}>{{field.label.text}}</label>
+            {{ field(class="form-control mb-3") }}
+            
+            {% endif %}
+          {% endfor %}
 
-            {% for field in form if field.widget.input_type != 'hidden' and field.widget.input_type == 'password' %}
-              {% for error in field.errors %}
-                <span class="text-danger">{{ error }}</span>
-              {% endfor %}
-              <label style="font-weight: bold; font-size: 16px" for={{field.label.text}}>{{field.label.text}}</label>
-              {{ field(class="form-control mb-3", placeholder="Only fill out if you want to change password") }}
+
+          {% for field in form if field.widget.input_type != 'hidden' and field.widget.input_type == 'password' %}
+            {% for error in field.errors %}
+              <span class="text-danger">{{ error }}</span>
             {% endfor %}
+            <label style="font-weight: bold; font-size: 16px" for={{field.label.text}}>{{field.label.text}}</label>
+            {{ field(class="form-control mb-3", placeholder="Only fill out if you want to change password") }}
+          {% endfor %}
 
-            <button style="width:100%" class="btn btn-primary">Submit</button>
+          <button style="width:100%" class="btn btn-primary">Submit</button>
 
-          </form>
+        </form>
+      </div>
+      </div>
     </div>
+ 
+   
   </div>
 
 {% endblock %}

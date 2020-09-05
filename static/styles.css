@@ -134,6 +134,14 @@ body {
     height: 15em
 }
 
+.home.card-body.loggedUser h6 {
+    height: 3em;
+}
+
+.home.card-body.loggedUser {
+ height: 25em
+}
+
 .results.card-body {
     height: 13em;
 }
@@ -228,8 +236,10 @@ body {
 }
 
 /* USER HUB */
-.user_hub {
-    padding: 2em
+.user_hub .nav-tabs {
+    background-color: black;
+    height: 100%;
+    padding: 1em;
 }
 
 .fa.fa-cog {
@@ -240,10 +250,47 @@ body {
     list-style: none;
 }
 
+.hub-header .jumbotron {
+    height: auto;
+    padding: 2em;
+    background-color: black;
+    color: white;
+    margin-bottom: 0
+}
+
+.hub-header .jumbotron .display-4 {
+    font-weight: 400
+}
 /* FOOTER */
 
 footer {
     background-color: black;
     color: white;
     padding: 1em;
+}
+
+
+@media (min-width: 576px) {
+.modal-dialog {
+    max-width: 70%;
+    min-width: 50%
+}
+}
+
+/* LIBRARY */
+
+
+
+
+
+.hideCard {
+    display: none
+}
+
+.onload {
+    display: block;
+}
+
+.showCard {
+    display: block
 }

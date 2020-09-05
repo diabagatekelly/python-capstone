@@ -7,15 +7,138 @@
 <div class="container-fluid p-5">
     <div class="row d-flex">
         <div class="col-sm-12 col-md-6">
+            {% if helperRecipes|length > 0 and recipe.id == helperRecipes[0].api_id %}
+                                      <!-- Modal -->
+      <div class="modal fade" id="editLibraryTags" tabindex="-1" role="dialog" aria-labelledby="editLibraryTagsFormLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="eeditLibraryTagsFormLabel">Edit Library Tags</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div> 
+            <div class="modal-body">
+              <div class="row d-flex">
+                <div class="col-3">
+                  <form action="/recipe/{{recipe.id}}/newTag">
+          
+                    <h5 class="mb-2">Custom Tags</h5>
+                    <label for="newCustomTag">Create a new custom tag (ie. food type, ingredient, meal type, etc...)</label><br>
+                    <input class="mb-2" type="text" id="newCustomTag" name="newCustomTag">
+                 
+                    <button class="btn btn-primary">Create</button>
+
+            </form>
+                </div>
+                <div class="col-9">
+                  <form method="POST" action="/recipe/{% for item in user.saved_recipes %}{% if item.api_id == recipe.id %}{{item.id}}{% endif %}{% endfor %}/editLibraryTags" id="library_tags" style="width: 75%; margin: 0 auto">
+                 
+                    {{ form.hidden_tag() }}
+                    <div class="container">
+                      <div class="row d-flex">
+                        <div class="col-6">
+                          {% if form.displayCustoms %}
+                          <h5>Existing custom tags:</h5>
+                          {{form.displayCustoms}}
+                          {% endif %}
+
+                          <h5>Diets</h5>
+                          {{form.diets}}
+                        
+                        </div>
+                        <div class="col-6">
+                          <h5>Cuisines</h5>
+                          {{form.fave_cuisines}}
+                         
+                        </div>
+                      </div>
+                    </div>
+                 
+                   <button class="btn btn-primary">Save changes</button>
+          
+                  </form>
+                </div>
+              </div>
+              <!-- <div class="container mb-5">
+                <div class="row d-flex">
+                  <div class="col-12 text-left justify-content-center"> -->
+           
+                  <!-- </div>
+                </div>
+              </div> -->
+              
+    
+           
+             
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+            <h1>
+                <a href="#editLibraryTags" data-toggle="modal" data-target="#editLibraryTags"><i style="color: blue" data-toggle="tooltip" data-placement="top" title="Edit library tags" class="fa fa-edit"></i></a>      
+                <a href="/delete_recipe/{{recipe.id}}"><i style="color: red" data-toggle="tooltip" data-placement="top" title="Delete from library" class="fa fa-minus-circle"></i></a>
+                {{recipe.title}}
+            </h1>          
+            {% else %}
             <h1><a href="/save_recipe/{{recipe.id}}"><i style="color: green" data-toggle="tooltip" data-placement="top" title="Save to library" class="fa fa-plus-circle"></i></a>{{recipe.title}}</h1>
+           {%endif%}
+           
             <h6 class="mt-3"><b>Source: </b><a href="{{recipe.sourceUrl}}" target="_blank"><span>{{recipe.creditsText}}</span></a></h6>
             <h6 class="mb-2 mt-5"><span><b>Ready In:</b> {{recipe.readyInMinutes}} min.</span> | <span><b>Calories: </b> {{recipe.nutrition.nutrients[0].amount}}</span> </h6>
             <p class="recipe-summary">{{recipe.summary}}</p>
+            {% if helperRecipes|length > 0 and recipe.id == helperRecipes[0].api_id %}
+<hr/>          
+            {% if helperRecipes[0].saved_recipes_linked_cuisine %}
+            <p class="text-left"><b><i>Library Tags - Cuisines:</i></b>  
+              {% for r in helperRecipes[0].saved_recipes_linked_cuisine %}
+                <span><i>{{r.name}},</i></span>
+              {% endfor %}
+            </p>
+            {% else %}
+            <p class="text-left"><b><i>Library Tags - Cuisines:</i></b>  
+              <span><i>None</i></span>
+            </p>
+            {% endif %}
+         
+            {% if helperRecipes[0].saved_recipes_linked_diet %}
+            <p class="text-left"><b><i>Library Tags - Diets:</i></b>  
+              {% for d in helperRecipes[0].saved_recipes_linked_diet %}
+                <span><i>{{d.name}},</i></span>
+              {% endfor %}
+            </p>
+            {% else %}
+            <p class="text-left"><b><i>Library Tags - Diets:</i></b>  
+              <span><i>None</i></span>
+            </p>
+            {% endif %}
+
+            {% if helperRecipes[0].saved_recipes_linked_custom %}
+            <p class="text-left"><b><i>Library Tags - Custom Tags:</i></b>  
+              {% for t in helperRecipes[0].saved_recipes_linked_custom %}
+                <span><i>{{t.name}},</i></span>
+              {% endfor %}
+            </p>
+            {% else %}
+            <p class="text-left"><b><i>Library Tags - Custom Tags:</i></b>  
+              <span><i>None</i></span>
+            </p>
+            {% endif %}
+
+
+            <a href="#editLibraryTags" data-toggle="modal" data-target="#editLibraryTags" class="btn btn-primary">Edit Library Tags</a>
+            <a href="/delete_recipe/{{recipe.id}}" class="btn btn-danger">Delete From Library</a>
+            {% else %}
             <a href="/save_recipe/{{recipe.id}}" class="btn btn-success">Save to Library</a>
+            {% endif %}
         </div>
         <div class="col-sm-12 col-md-6">
             <img src="{{recipe.image}}" class="img-fluid">
         </div>
+
     </div>
     <hr/>
     <div class="row d-flex mt-5">

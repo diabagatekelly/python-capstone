@@ -57,6 +57,70 @@
                                   <a href="/delete_recipe/{{item.id}}"><i data-toggle="tooltip" data-placement="top" title="Delete from library" class="fa fa-minus-circle"></i></a>
                               </div>
                           </div>                      
+                          <div class="home card-body loggedUser">
+                            <div class="header">
+                              <h6 class="text-center">{{item.title}}</h6>
+                            
+                           <hr/>
+                           
+                                {% for rec in DBSavedRecipes %}    
+          
+                                {% if rec.api_id == item.id and rec.saved_recipes_linked_cuisine %}
+                                <p class="text-left"><b><i>Library Tags - Cuisines:</i></b>   
+                                  {% for r in rec.saved_recipes_linked_cuisine %}
+                                    <span><i>{{r.name}},</i></span>
+                                  {% endfor %}
+                                </p>
+                                {% elif rec.api_id == item.id and not rec.saved_recipes_linked_cuisine %}
+                                <p class="text-left"><b><i>Library Tags - Cuisines:</i></b>         
+                                  <span><i>None</i></span>
+                                </p>
+                                {% endif %}
+                             
+                                {% if rec.api_id == item.id and rec.saved_recipes_linked_diet %}
+                                <p class="text-left"><b><i>Library Tags - Diets:</i></b>     
+                                  {% for d in rec.saved_recipes_linked_diet %}
+                                    <span><i>{{d.name}},</i></span>
+                                  {% endfor %}
+                                </p>
+                                {% elif rec.api_id == item.id and not rec.saved_recipes_linked_diet %}
+                                <p class="text-left"><b><i>Library Tags - Diets:</i></b>        
+                                  <span><i>None</i></span>
+                                </p>
+                                {% endif %}
+
+                                {% if rec.api_id == item.id and rec.saved_recipes_linked_custom %}
+                                <p class="text-left"><b><i>Library Tags - Custom Tags:</i></b>     
+                                  {% for t in rec.saved_recipes_linked_custom %}
+                                    <span><i>{{t.name}},</i></span>
+                                  {% endfor %}
+                                </p>
+                                {% elif rec.api_id == item.id and not rec.saved_recipes_linked_custom %}
+                                <p class="text-left"><b><i>Library Tags - Custom Tags:</i></b>        
+                                  <span><i>None</i></span>
+                                </p>
+                                {% endif %}
+
+                              {% endfor %}
+                          
+                            </div>
+                          
+                              <hr/>
+                              <a href="/recipe/{{item.id}}"><p>View recipe details</p></a>                           
+                              <a href="/recipe/{{item.id}}/similar?page={{page.page}}"><p>Browse similar recipes</p></a>
+                              <a href="/recipe/{{item.id}}#editLibraryTags"><p>Edit Library Tags</p></a>
+                
+                            </div>
+                          </div>
+                      </div>
+                    <!-- <div class="col-12 col-md-3">
+                        <div class="card" style="width: 15rem; margin: 1rem auto">
+                          <div class="img-container">
+                              <img class="card-img-top" src="{{item.image}}" alt="Card image cap">
+                              <div class="overlay minus text-center">
+                                  <a href="/delete_recipe/{{item.id}}"><i data-toggle="tooltip" data-placement="top" title="Delete from library" class="fa fa-minus-circle"></i></a>
+                              </div>
+                          </div>                      
                           <div class="home card-body">
                               <h6 class="home card-title text-center">{{item.title}}</h6>
                               <hr/>
@@ -64,7 +128,7 @@
                               <a href="/recipe/{{item.id}}/similar?page={{page.page}}"><p>Browse similar recipes</p></a>
                             </div>
                           </div>
-                      </div>
+                      </div> -->
                     {% endfor %}
                 </div>
          

@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}{{user.first_name}}{% endblock %}
+
+{% block content %}
+<div class="row d-flex align-items-center hub-header">
+  <div class="col-12">
+    <div class="jumbotron jumbotron-fluid align-items-center">
+      <div class="container">
+        <h1 class="display-4 text-center">Hello, {{user.first_name}}!</h1>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="row align-items-top user_hub">
+    <div class="col-2">
+      <div class="nav flex-column nav-tabs" id="user-hub-tab" role="tablist" aria-orientation="vertical">
+        <a class="nav-link"  href="/users/{{user.id}}/hub" role="tab" aria-controls="recently-saved" aria-selected="false">Recently Saved</a>
+        <a class="nav-link" href="/users/{{user.id}}/preferences" role="tab" aria-controls="edit-prefs" aria-selected="false">Edit Search Preferences</a>
+        <a class="nav-link active" data-toggle="tab" id="library" href="#library" role="tab" aria-controls="library" aria-selected="true">View Full Library</a>
+      </div>
+    </div>
+    <div class="col-10">
+      <div class="tab-content" id="user-hub-tab">
+        <div class="tab-pane active" id="library" role="tabpanel" aria-labelledby="library">
+          <div class="row d-flex">
+            <div class="col-12">
+              <h2 class="text-left mt-5 mb-3">Your Library</h2>
+            </div>
+            <div class="col-12">
+              <!-- <form id="library_sort" action="/users/{{user.id}}/library/sort"> -->
+                <div class="container-fluid">
+                  <div class="row d-flex">
+                    <div class="col-4">
+                      <h6>Sort by cuisines:</h6>
+                        {% for cuisine in user.saved_recipes_cuisine_tags %}
+                          <input type="checkbox" id="{{cuisine.name}}" name="cuisines" value="{{cuisine.name}}">
+                          <label for="{{cuisine.name}}">{{cuisine.name}}</label><br>
+                        {% endfor %}
+                    </div>
+                    <div class="col-4">
+                      <h6>Sort by diets:</h6>
+                        {% for diet in user.saved_recipes_diet_tags %}
+                        <input type="checkbox" id="{{diet.name}}" name="diets" value="{{diet.name}}">
+                        <label for="{{diet.name}}">{{diet.name}}</label><br>
+                        {% endfor %}
+                    </div>
+                    <div class="col-4">
+                      <h6>Sort by custom:</h6>
+                      {% for custom in user.saved_recipes_custom_tags %}
+                      <input type="checkbox" id="{{custom.name}}" name="customs" value="{{custom.name}}">
+                      <label for="{{custom.name}}">{{custom.name}}</label><br>
+                      {% endfor %}
+                    </div>
+                    <!-- <div class="col-12">
+                      <button style="width:100%" class="btn btn-primary">Sort</button>
+                    </div> -->
+                  </div>
+                </div>
+              <!-- </form> -->
+            </div>
+ 
+    
+            <div class="col-12">
+              <hr/>
+
+            </div>
+            <div class="col-12 text-left">
+              <p><i>Showing all recipes ({{savedRecipes|length}})</i></p>
+            </div>
+            <div class="row d-flex" id="all_recipes">
+              {% for item in savedRecipes %}
+        
+              <div id="{{item.id}}" class="library_recipe col-12 col-md-3">
+                <div class="card" style="width: 15rem; margin: 1rem auto">
+                  <div class="img-container">
+                      <img class="card-img-top" src="{{item.image}}" alt="Card image cap">
+                      <div class="overlay minus text-center">
+                          <a href="/delete_recipe/{{item.id}}"><i data-toggle="tooltip" data-placement="top" title="Delete from library" class="fa fa-minus-circle"></i></a>
+                      </div>
+                  </div>                      
+                  <div class="home card-body loggedUser">
+                    <div class="header">
+                      <h6 class="text-center">{{item.title}}</h6>
+                    
+                   <hr/>
+                   
+                        {% for rec in DBSavedRecipes %}
+  
+  
+                        {% if rec.api_id == item.id and rec.saved_recipes_linked_cuisine %}
+                        <p class="library_cuisine_tags text-left"><b><i>Library Tags - Cuisines:</i></b>  
+                          {% for r in rec.saved_recipes_linked_cuisine %}
+                            <span class="{{r.name}}"><i>{{r.name}},</i></span>
+                          {% endfor %}
+                        </p>
+                        {% elif rec.api_id == item.id and not rec.saved_recipes_linked_cuisine %}
+                        <p class="text-left"><b><i>Library Tags - Cuisines:</i></b>  
+                          <span><i>None</i></span>
+                        </p>
+                        {% endif %}
+                     
+                        {% if rec.api_id == item.id and rec.saved_recipes_linked_diet %}
+                        <p class="library_diet_tags text-left"><b><i>Library Tags - Diets:</i></b>  
+                          {% for d in rec.saved_recipes_linked_diet %}
+                            <span class="{{d.name}}"><i>{{d.name}},</i></span>
+                          {% endfor %}
+                        </p>
+                        {% elif rec.api_id == item.id and not rec.saved_recipes_linked_diet %}
+                        <p class="text-left"><b><i>Library Tags - Diets:</i></b>  
+                          <span><i>None</i></span>
+                        </p>
+                        {% endif %}
+  
+                        {% if rec.api_id == item.id and rec.saved_recipes_linked_custom %}
+                        <p class="library_custom_tags text-left"><b><i>Library Tags - Custom Tags:</i></b>  
+                          {% for t in rec.saved_recipes_linked_custom %}
+                            <span class="{{t.name}}"><i>{{t.name}},</i></span>
+                          {% endfor %}
+                        </p>
+                        {% elif rec.api_id == item.id and not rec.saved_recipes_linked_custom %}
+                        <p class="text-left"><b><i>Library Tags - Custom Tags:</i></b>  
+                          <span><i>None</i></span>
+                        </p>
+                        {% endif %}
+  
+                      {% endfor %}
+                  
+                    </div>
+                  
+                      <hr/>
+                      <a href="/recipe/{{item.id}}"><p>View recipe details</p></a>                           
+                      <a href="/recipe/{{item.id}}/similar?page={{page.page}}"><p>Browse similar recipes</p></a>
+                      <a href="/recipe/{{item.id}}#editLibraryTags"><p>Edit Library Tags</p></a>
+        
+                    </div>
+                  </div>
+              </div>
+              {% endfor %}
+            </div>
+          
+          </div>
+        </div>
+    
+      </div>
+    </div>
+  <div class="col-10">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, msg in messages %}
+        <div class="flash {{ category }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+   </div>
+ 
+</div>
+
+
+
+{% endblock %}

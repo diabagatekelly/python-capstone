@@ -2,7 +2,7 @@
 
 from csv import DictReader
 from app import db
-from models import db, connect_db, User, CreatedRecipe, SavedRecipe, Cuisine, Diet, Intolerance, FaveSavedRecipes, FaveCreatedRecipes, FaveCuisines, FaveDiets, FoodIntolerances, Saved_Recipe_Cuisine, Saved_Recipe_Diet, Saved_Recipe_Intolerance, Created_Recipe_Cuisine, Created_Recipe_Diet, Created_Recipe_Intolerance
+from models import db, connect_db, User, CreatedRecipe, SavedRecipe, CustomTag, Cuisine, Diet, Intolerance, FaveSavedRecipes, FaveCreatedRecipes, UserCustomTags, FaveCuisines, FaveDiets, FoodIntolerances, UserSavedRecipesCustom, UserSavedRecipesCuisine, UserCreatedRecipesCustom, UserCreatedRecipesCuisine, UserSavedRecipesDiet, UserCreatedRecipesDiet
 
 
 db.drop_all()

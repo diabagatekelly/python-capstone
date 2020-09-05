@@ -13,9 +13,67 @@ $('.carousel .carousel-item').each(function() {
           
           next.children(':first-child').clone().appendTo($(this));
         }
-  });
+});
 
+$(document).ready(function() {
+  $(".library_recipe").addClass('onload');
+})
+
+
+
+$('input[name=cuisines]').on('change', () => {
+  $(".library_recipe").removeClass('onload');
+  let tagArray = []
+
+  checkedArray = []
+
+  checked = $('input[name=cuisines]:checked')
+  for (x of checked) {
+    checkedArray.push(x.id)
+  }
+
+  $allRecipes = $("#all_recipes")[0].children
   
+
+  for (card of $allRecipes) {
+    let show;
+    tagList = card.firstElementChild.children[1].children[0].children[2].children
+   for (span of tagList) {
+     tagArray.push(span.className)
+   }
+   for (tag of tagArray) {
+    if (checkedArray.includes(tag)) {
+      show = true
+    }  else {
+      if (show != true) {
+        show = false
+      }
+       else {
+         show = true
+       }
+    }
+    console.log(tag, checkedArray, show)
+   }
+   tagArray = []
+   console.log('finished a card')
+   if (show === true) {
+     console.log('running true')
+    cardID = card.id
+    $(`#${cardID}`).addClass('showCard')
+    $(`#${cardID}`).removeClass('hideCard')
+    show=false
+  } else {
+    console.log('running false')
+
+    cardID = card.id
+    $(`#${cardID}`).removeClass('showCard')
+    $(`#${cardID}`).addClass('hideCard')
+  }
+
+   
+  
+}
+})
 
 $recipe_summary = $(".recipe-summary");
 function strip_html_tags_summary(str) {
@@ -35,7 +93,6 @@ strip_html_tags_summary(str)
 $recipe_directions = $('#recipe-directions')
 str2 = $recipe_directions[0].innerText
 function strip_html_tags_directions(str2) {
-  console.log(str2)
   if ((str2===null) || (str2===''))
       return false;
  else
@@ -49,7 +106,6 @@ $('#directions-tab').click(strip_html_tags_directions(str2))
 
 $('#servingMeasure input').on('change', function() {
   $servingMeasure = $('input[name=inlineRadioOptions]:checked', '#servingMeasure').val();
-console.log($servingMeasure);
 
  if (!$servingMeasure || $servingMeasure === 'US') {
     $('#us').show();
@@ -59,3 +115,9 @@ console.log($servingMeasure);
   $('#us').hide();
   } 
 });
+
+
+if(window.location.hash) {
+  var hash = window.location.hash;
+  $(hash).modal('toggle');
+}
