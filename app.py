@@ -20,7 +20,8 @@ APIKEY = keys.spoonacular_api_key
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///recipes'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'DATABASE_URL', 'postgresql:///recipes')
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
