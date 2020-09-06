@@ -16,7 +16,7 @@ RECIPES = []
 OFFSET = 0
 
 SPOONACULAR_RECIPES_URL = "https://api.spoonacular.com/recipes"
-APIKEY = Keys.spoonacular_api_key
+APIKEY = os.environ.get('APIKEY', Keys.spoonacular_api_key)
 
 app = Flask(__name__)
 
