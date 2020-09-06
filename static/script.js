@@ -21,59 +21,74 @@ $(document).ready(function() {
 
 
 
-$('input[name=cuisines]').on('change', () => {
-  $(".library_recipe").removeClass('onload');
-  let tagArray = []
-
+$('input[type=checkbox]').on('change', () => {
   checkedArray = []
 
-  checked = $('input[name=cuisines]:checked')
+  checked = $('input[type=checkbox]:checked')
   for (x of checked) {
     checkedArray.push(x.id)
   }
 
-  $allRecipes = $("#all_recipes")[0].children
-  
 
-  for (card of $allRecipes) {
-    let show;
-    tagList = card.firstElementChild.children[1].children[0].children[2].children
-   for (span of tagList) {
-     tagArray.push(span.className)
-   }
-   for (tag of tagArray) {
-    if (checkedArray.includes(tag)) {
-      show = true
-    }  else {
-      if (show != true) {
-        show = false
-      }
-       else {
-         show = true
-       }
+  if (checkedArray.length !=0) {
+    $(".library_recipe").removeClass('onload');
+    let tagArray = []
+    $allRecipes = $("#all_recipes")[0].children
+  
+    for (card of $allRecipes) {
+      console.log(card)
+      let show;
+      cuisineTagList = card.firstElementChild.children[1].children[0].children[2].children
+      dietTagList = card.firstElementChild.children[1].children[0].children[3].children
+      customTagList = card.firstElementChild.children[1].children[0].children[4].children
+     for (span of cuisineTagList) {
+       tagArray.push(span.className)
+     }
+     for (span of dietTagList) {
+      tagArray.push(span.className)
     }
-    console.log(tag, checkedArray, show)
-   }
-   tagArray = []
-   console.log('finished a card')
-   if (show === true) {
-     console.log('running true')
-    cardID = card.id
-    $(`#${cardID}`).addClass('showCard')
-    $(`#${cardID}`).removeClass('hideCard')
-    show=false
-  } else {
-    console.log('running false')
-
-    cardID = card.id
-    $(`#${cardID}`).removeClass('showCard')
-    $(`#${cardID}`).addClass('hideCard')
+    for (span of customTagList) {
+      tagArray.push(span.className)
+    }
+     for (tag of tagArray) {
+      if (checkedArray.includes(tag)) {
+        show = true
+      }  else {
+        if (show != true) {
+          show = false
+        }
+         else {
+           show = true
+         }
+      }
+     }
+     tagArray = []
+     if (show === true) {
+      cardID = card.id
+      $(`#${cardID}`).addClass('showCard')
+      $(`#${cardID}`).removeClass('hideCard')
+      show=false
+    } else {  
+      cardID = card.id
+      $(`#${cardID}`).removeClass('showCard')
+      $(`#${cardID}`).addClass('hideCard')
+    }
   }
+  $showingNum = $('.showCard')
+  $('#showingNum').html($showingNum.length)
 
-   
-  
-}
+  } else {
+    $(".library_recipe").addClass('onload');
+    $(`#${cardID}`).removeClass('hideCard')
+    $(`#${cardID}`).removeClass('showCard')
+
+    $showingNum = $('.onload')
+    $('#showingNum').html($showingNum.length)
+  }
 })
+
+
+
 
 $recipe_summary = $(".recipe-summary");
 function strip_html_tags_summary(str) {

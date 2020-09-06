@@ -279,18 +279,19 @@ footer {
 
 /* LIBRARY */
 
-
-
-
-
 .hideCard {
     display: none
+}
+
+.showCard {
+    display: block
 }
 
 .onload {
     display: block;
 }
 
-.showCard {
-    display: block
+
+#all_recipes {
+    width: 100%
 }

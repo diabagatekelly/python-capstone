@@ -1,5 +1,6 @@
 from datetime import timedelta
 from flask import Flask, request, render_template, redirect, flash, session, g, jsonify
+from werkzeug.exceptions import HTTPException
 from flask_session import Session
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
@@ -9,28 +10,17 @@ import requests
 import keys
 
 CURR_USER_KEY = "curr_user"
-
 NO_RECIPES = "NO_RECIPES"
-
 RECIPES = []
-
 OFFSET = 0
 
 SPOONACULAR_RECIPES_URL = "https://api.spoonacular.com/recipes"
 APIKEY = keys.spoonacular_api_key
 
-# CUISINES = [African, American, British, Cajun, Caribbean, Chinese, Eastern European, European, French, German, Greek, Indian, Irish, Italian, Japanese, Jewish, Korean, Latin American, Mediterranean, Mexican, Middle Eastern, Nordic, Southern, Spanish, Thai, Vietnamese]
-
-# DIETS = [Gluten Free, Ketogenic, Vegetarian, Lacto-Vegetarian, Ovo-Vegetarian, Vegan, Pescetarian, Paleo, Primal, Whole30]
-
-# INTOLERANCES = [Dairy, Egg, Gluten, Grain, Peanut, Seafood, Sesame, Shellfish, Soy, Sulfite, Tree Nut, Wheat]
-
 app = Flask(__name__)
-
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///recipes'
 app.config['SESSION_TYPE'] = 'filesystem'
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = 'kellya01/22/1990'
@@ -41,9 +31,9 @@ connect_db(app)
 sess = Session()
 sess.init_app(app)
 
-
 @app.before_request
 def make_session_permanent():
+    """Establish session"""
     SESSION_PERMANENT = True
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 
@@ -51,12 +41,11 @@ def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
-
     else:
         g.user = None
 
-
 def create_session_recipes():
+    """Add recent API recipes to session"""
     if not NO_RECIPES in session:
         session["recipes"] = []
         session[NO_RECIPES] = "no_recipes"
@@ -80,17 +69,19 @@ def do_logout():
     if "saved_recipes" in session:
         del session["saved_recipes"]
 
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('error.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('error.html'), 500
+
+
 @app.route('/register', methods=["GET", "POST"])
 def register():
-    """Handle user register.
-
-    Create new user and add to DB. Redirect to home page.
-
-    If form not valid, present form.
-
-    If the there already is a user with that username: flash message
-    and re-present form.
-    """
+    """Handle user register"""
 
     form = UserAddForm()
 
@@ -124,7 +115,6 @@ def register():
             return render_template('users/register.html', form=form)
 
     else:
-        # flash("There was an error, try again", 'danger')
         return render_template('users/register.html', form=form)
 
 
@@ -138,7 +128,6 @@ def login():
         if form.validate_on_submit():
             user = User.authenticate(form.username.data,
                                     form.password.data)
-            print(user)
 
             if user:
                 do_login(user)
@@ -175,11 +164,9 @@ def login():
 def logout():
     """Handle logout of user."""
 
-    # IMPLEMENT THIS
     do_logout()
     flash("You have successfully logged out!", "success")
-    return redirect("/login")
-
+    return redirect("/")
     
     if not CURR_USER_KEY in session:
         flash("You are not currently logged in!", "danger")
@@ -191,13 +178,10 @@ def home():
     page = {}
 
     if not CURR_USER_KEY in session or not 'curr_user' in session:
-
         recipes = []
-
         create_session_recipes()
 
         if len(session["recipes"]) == 0:
-            print("calling api")
             res = requests.get(f"{SPOONACULAR_RECIPES_URL}/random", params={"number":8, "apiKey": APIKEY}).json()
 
             page["page"] = 1
@@ -211,13 +195,14 @@ def home():
                     "image": item["image"],
                     "cuisines": item["cuisines"],
                     "diets": item["diets"]
-                    })
+                })
 
                 RECIPES = recipes
 
                 session["recipes"] = RECIPES
 
             return render_template("home.html", recipes=recipes, page=page)
+
 
         elif len(session["recipes"]) > 0:
             print("from session")
@@ -557,9 +542,9 @@ def user_pref_form(user_id):
 def user_pref_form_edit(user_id):
     if CURR_USER_KEY in session:
         user = User.query.get_or_404(user_id)
-        exisitingfaveCuisines = FaveCuisines.query.all()
-        exisitingfaveDiets = FaveDiets.query.all()
-        exisitingFoodIntolerances = FoodIntolerances.query.all()
+        exisitingfaveCuisines = FaveCuisines.query.filter_by(user_id=user_id).all()
+        exisitingfaveDiets = FaveDiets.query.filter_by(user_id=user_id).all()
+        exisitingFoodIntolerances = FoodIntolerances.query.filter_by(user_id=user_id).all()
 
         cuisineIDs = []
         dietIDs = []
@@ -583,7 +568,6 @@ def user_pref_form_edit(user_id):
         form.fave_cuisines.choices = cuisines
         form.diets.choices = diets
         form.intolerances.choices = intolerances
-
         if form.validate_on_submit():
             user.username = form.username.data
             user.first_name = form.first_name.data
@@ -600,9 +584,12 @@ def user_pref_form_edit(user_id):
             new_diets = form.diets.data
             new_intolerances = form.intolerances.data
 
+            print(f"hjghsdgghgagfffffffffffffffffffffffffffffffffffffffffff{exisitingfaveCuisines}")
+            print(new_fave_cuisines)
+
             for current in exisitingfaveCuisines:
                 if current.cuisines_id not in new_fave_cuisines:
-                    deleted = FaveCuisines.query.filter_by(cuisines_id=current.cuisines_id).delete()
+                    deleted = FaveCuisines.query.filter(FaveCuisines.cuisines_id==current.cuisines_id, FaveCuisines.user_id==user.id).delete()
 
             for cuisine in new_fave_cuisines:
                 if cuisine not in cuisineIDs:
@@ -611,7 +598,7 @@ def user_pref_form_edit(user_id):
 
             for current in exisitingfaveDiets:
                 if current.diets_id not in new_diets:
-                    deleted = FaveDiets.query.filter_by(diets_id=current.diets_id).delete()
+                    deleted = FaveDiets.query.filter(FaveDiets.diets_id==current.diets_id, FaveDiets.user_id==user.id).delete()
 
             for diet in new_diets:
                 if diet not in dietIDs:
@@ -620,7 +607,7 @@ def user_pref_form_edit(user_id):
             
             for current in exisitingFoodIntolerances:
                 if current.intolerances_id not in new_intolerances:
-                    deleted = FoodIntolerances.query.filter_by(intolerances_id=current.intolerances_id).delete()
+                    deleted = FoodIntolerances.query.filter(FoodIntolerances.intolerances_id==current.intolerances_id, FoodIntolerances.user_id==user.id).delete()
 
             for intol in new_intolerances:
                 if intol not in intoleranceIDs:
@@ -630,7 +617,8 @@ def user_pref_form_edit(user_id):
             user.new_user = False
 
             db.session.commit()
- 
+
+            print('after validate')
             flash("You successfully picked your food preferences", "success")
             return redirect(f"/users/{user.id}/hub")
             

@@ -28,7 +28,6 @@
               <h2 class="text-left mt-5 mb-3">Your Library</h2>
             </div>
             <div class="col-12">
-              <!-- <form id="library_sort" action="/users/{{user.id}}/library/sort"> -->
                 <div class="container-fluid">
                   <div class="row d-flex">
                     <div class="col-4">
@@ -37,6 +36,8 @@
                           <input type="checkbox" id="{{cuisine.name}}" name="cuisines" value="{{cuisine.name}}">
                           <label for="{{cuisine.name}}">{{cuisine.name}}</label><br>
                         {% endfor %}
+                        <input type="checkbox" id="None (Cuisine)" name="cuisines" value="None (Cuisine)">
+                        <label for="None (Cuisine)">None (Cuisine)</label><br>
                     </div>
                     <div class="col-4">
                       <h6>Sort by diets:</h6>
@@ -44,6 +45,8 @@
                         <input type="checkbox" id="{{diet.name}}" name="diets" value="{{diet.name}}">
                         <label for="{{diet.name}}">{{diet.name}}</label><br>
                         {% endfor %}
+                        <input type="checkbox" id="None (Diet)" name="diets" value="None (Diet)">
+                        <label for="None (Diet)">None (Diet)</label><br>
                     </div>
                     <div class="col-4">
                       <h6>Sort by custom:</h6>
@@ -51,13 +54,11 @@
                       <input type="checkbox" id="{{custom.name}}" name="customs" value="{{custom.name}}">
                       <label for="{{custom.name}}">{{custom.name}}</label><br>
                       {% endfor %}
+                      <input type="checkbox" id="None (Custom)" name="customs" value="None (Custom)">
+                      <label for="None (Custom)">None (Custom)</label><br>
                     </div>
-                    <!-- <div class="col-12">
-                      <button style="width:100%" class="btn btn-primary">Sort</button>
-                    </div> -->
                   </div>
                 </div>
-              <!-- </form> -->
             </div>
  
     
@@ -66,7 +67,7 @@
 
             </div>
             <div class="col-12 text-left">
-              <p><i>Showing all recipes ({{savedRecipes|length}})</i></p>
+              <p><i>Showing <span id="showingNum">{{savedRecipes|length}}</span> recipes out of {{savedRecipes|length}}</i></p>
             </div>
             <div class="row d-flex" id="all_recipes">
               {% for item in savedRecipes %}
@@ -96,7 +97,7 @@
                         </p>
                         {% elif rec.api_id == item.id and not rec.saved_recipes_linked_cuisine %}
                         <p class="text-left"><b><i>Library Tags - Cuisines:</i></b>  
-                          <span><i>None</i></span>
+                          <span class="None (Cuisine)"><i>None (Cuisine)</i></span>
                         </p>
                         {% endif %}
                      
@@ -108,7 +109,7 @@
                         </p>
                         {% elif rec.api_id == item.id and not rec.saved_recipes_linked_diet %}
                         <p class="text-left"><b><i>Library Tags - Diets:</i></b>  
-                          <span><i>None</i></span>
+                          <span class="None (Diet)"><i>None (Diet)</i></span>
                         </p>
                         {% endif %}
   
@@ -120,7 +121,7 @@
                         </p>
                         {% elif rec.api_id == item.id and not rec.saved_recipes_linked_custom %}
                         <p class="text-left"><b><i>Library Tags - Custom Tags:</i></b>  
-                          <span><i>None</i></span>
+                          <span class="None (Custom)"><i>None (Custom)</i></span>
                         </p>
                         {% endif %}
   
