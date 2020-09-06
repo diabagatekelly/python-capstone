@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User, CreatedRecipe, SavedRecipe, CustomTag, Cuisine, Diet, Intolerance, FaveSavedRecipes, FaveCreatedRecipes, UserCustomTags, FaveCuisines, FaveDiets, FoodIntolerances, UserSavedRecipesCustom, UserSavedRecipesCuisine, UserCreatedRecipesCustom, UserCreatedRecipesCuisine, UserSavedRecipesDiet, UserCreatedRecipesDiet
 from forms import UserAddForm, UserEditForm, LoginForm
 import requests
+import os
 import keys
 
 CURR_USER_KEY = "curr_user"
@@ -23,7 +24,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///recipes'
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
-app.config['SECRET_KEY'] = 'kellya01/22/1990'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'kellya01sdlhLAKDS22hdjhjakshdk1990')
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 debug = DebugToolbarExtension(app)
 connect_db(app)
