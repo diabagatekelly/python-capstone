@@ -247,38 +247,66 @@ def browse():
     searchRecipes = []
     totalResults = 0
 
-    user = User.query.get_or_404(session["curr_user"])
+    if "curr_user" in session:
 
-    offset = OFFSET
+        user = User.query.get_or_404(session["curr_user"])
 
-    searchArgs = request.args.get("search")
+        offset = OFFSET
 
-    intolerances = [i.name for i in user.intolerances]
-    intoleranceString = ' ,'.join(intolerances)
+        searchArgs = request.args.get("search")
 
-    searchDiets = request.args.getlist('diets')
-    dietString = ' ,'.join(searchDiets)
+        intolerances = [i.name for i in user.intolerances]
+        intoleranceString = ' ,'.join(intolerances)
 
-    searchCuisines = request.args.getlist("cuisines")
-    cuisineString = ' ,'.join(searchCuisines)
-    
+        searchDiets = request.args.getlist('diets')
+        dietString = ' ,'.join(searchDiets)
 
-    page = int(request.args.get("page"))
+        searchCuisines = request.args.getlist("cuisines")
+        cuisineString = ' ,'.join(searchCuisines)
+        
 
-    offset = OFFSET + ((page -1) * 20)   
+        page = int(request.args.get("page"))
 
-    res = requests.get(f"{SPOONACULAR_RECIPES_URL}/complexSearch", params={"offset": offset, "query":{searchArgs}, "intolerances": {intoleranceString}, "diet":{dietString}, "cuisine":{cuisineString}, "number":20, "sort": "popularity", "apiKey": APIKEY}).json()
-    if not res["results"]:
-        print(res)
+        offset = OFFSET + ((page -1) * 20)   
+
+        res = requests.get(f"{SPOONACULAR_RECIPES_URL}/complexSearch", params={"offset": offset, "query":{searchArgs}, "intolerances": {intoleranceString}, "diet":{dietString}, "cuisine":{cuisineString}, "number":20, "sort": "popularity", "apiKey": APIKEY}).json()
+        if not res["results"]:
+            print(res)
+        else:
+            print("EVerything working fine")
+
+        for item in res["results"]:
+            searchRecipes.append(item)
+        totalResults = res["totalResults"]
+
+        return render_template("browse.html", searchRecipes=searchRecipes, page=page, user=user, totalResults=totalResults)
     else:
-        print("EVerything working fine")
+        user = None
+        offset = OFFSET
 
-    for item in res["results"]:
-        searchRecipes.append(item)
-    totalResults = res["totalResults"]
+        searchArgs = request.args.get("search")
 
-    return render_template("browse.html", searchRecipes=searchRecipes, page=page, user=user, totalResults=totalResults)
+        intoleranceString = ''
 
+        dietString = ''
+
+        cuisineString = ''
+        
+        page = int(request.args.get("page"))
+
+        offset = OFFSET + ((page -1) * 20)   
+
+        res = requests.get(f"{SPOONACULAR_RECIPES_URL}/complexSearch", params={"offset": offset, "query":{searchArgs}, "intolerances": {intoleranceString}, "diet":{dietString}, "cuisine":{cuisineString}, "number":20, "sort": "popularity", "apiKey": APIKEY}).json()
+        if not res["results"]:
+            print(res)
+        else:
+            print("EVerything working fine")
+
+        for item in res["results"]:
+            searchRecipes.append(item)
+        totalResults = res["totalResults"]
+
+        return render_template("browse.html", searchRecipes=searchRecipes, page=page, user=user, totalResults=totalResults)
 
 @app.route("/recipe/<int:id>")
 def recipe_details(id):
