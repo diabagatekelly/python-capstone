@@ -8,7 +8,7 @@ from models import db, connect_db, User, CreatedRecipe, SavedRecipe, CustomTag, 
 from forms import UserAddForm, UserEditForm, LoginForm
 import requests
 import os
-# from keys import Keys
+from keys import Keys
 
 CURR_USER_KEY = "curr_user"
 NO_RECIPES = "NO_RECIPES"

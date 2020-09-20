@@ -4,16 +4,14 @@
 
 {% block content %}
 
-  <div class="row justify-content-md-center">
-    <div class="col-12 mb-3">
-      {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, msg in messages %}
-          <div class="flash {{ category }}">{{ msg }}</div>
-      {% endfor %}
-  {% endwith %}
-  </div>
-  <div class="col-md-7 col-lg-5">
-    <h2 class="join-message">Create an account</h2>
+  <div class="row d-flex h-100 p-5">
+  <div class="col-12">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, msg in messages %}
+        <div class="flash {{ category }}">{{ msg }}</div>
+    {% endfor %}
+    {% endwith %}
+    <h2 class="join-message mb-5 text-center">Create an account</h2>
     <form method="POST" id="user_form">
       {{ form.hidden_tag() }}
 

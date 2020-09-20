@@ -29,7 +29,7 @@
             </div>
             {% if savedRecipes|length > 5 %}  
             {% for item in savedRecipes[savedRecipes|length-1: savedRecipes|length-6  :-1] %}
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-4">
               <div class="card" style="width: 15rem; margin: 1rem auto">
                 <div class="img-container">
                     <img class="card-img-top" src="{{item.image}}" alt="Card image cap">

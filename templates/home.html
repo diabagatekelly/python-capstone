@@ -17,7 +17,7 @@
                 {% for item in recipes %} 
                 {% if item.image %} 
                 <div class="carousel-item {% if loop.index == 1 %} active{% endif %}">
-                    <div style="height: 100%; background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0)), url({{item.image}}) no-repeat; background-size: cover; overflow: hidden;" class="col-6"></div>
+                    <div style="height: 100%; background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0)), url({{item.image}}) no-repeat; background-size: cover; overflow: hidden;" class="col-12"></div>
                 </div>
                 {% endif %}
                 {% endfor %}
@@ -37,7 +37,7 @@
           <div class="col-12">
               <div class="row d-flex">
                 {% for item in recipes %}
-                <div class="col-12 col-md-3">
+                <div class="col-6 col-md-4 col-lg-3">
                   <div class="card" style="width: 15rem; margin: 1rem auto">
                     <div class="img-container">
                         <img class="card-img-top" src="{{item.image}}" alt="Card image cap">

@@ -34,7 +34,7 @@ body {
     width: 75%;
     margin: 0 auto;
     position: absolute;
-    top: 50vh;
+    top: 25vh;
     left: 10vw;
     z-index: 5;
     border: 0.1em solid black;
@@ -49,7 +49,7 @@ body {
 }
 
 .jumbotron-fluid {
-    height: 90vh;
+    height: 50vh;
     padding: 0;
 }
 
@@ -92,6 +92,30 @@ body {
 
 .carousel-inner .carousel-item-right.active,
 .carousel-inner .carousel-item-next {
+  transform: translateX(100%);
+}
+
+.carousel-inner .carousel-item-left.active, 
+.carousel-inner .carousel-item-prev {
+  transform: translateX(-100%);
+}
+  
+.carousel-inner .carousel-item-right,
+.carousel-inner .carousel-item-left{ 
+  transform: translateX(0);
+  
+}
+
+@media only screen and (min-width: 768px) {
+    .carousel-item .col-12 {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 50%;
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .carousel-inner .carousel-item-right.active,
+.carousel-inner .carousel-item-next {
   transform: translateX(50%);
 }
 
@@ -105,6 +129,29 @@ body {
   transform: translateX(0);
   
 }
+}
+
+@media only screen and (min-width: 1366px) {
+    .jumbotron-fluid {
+        height: 90vh;
+    }
+
+    .homepage .form-control-lg {
+        top: 50vh;
+    }
+
+}
+
+@media only screen and (max-width: 1366px) and (orientation: landscape) {
+    .jumbotron-fluid {
+        height: 90vh;
+    }
+
+    .homepage .form-control-lg {
+        top: 50vh;
+    }
+}
+
 
 /* RECIPES */
 

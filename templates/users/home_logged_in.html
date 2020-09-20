@@ -18,23 +18,19 @@
             <input class="form-control form-control-lg form-control-borderless mb-3" type="text" placeholder="Search recipes" name="search">
             <input type="hidden" name="page" value="{{page.page}}">
             <div class="row d-flex">
-                <div class="col-sm-12 col-md-4">
-                    <!-- <div class="form-group"> -->
+                <div class="col-12 col-md-4">
                         <h6>Refine your search by your fave cuisine(s)</h6>
                         {% for cuisine in user.fave_cuisines %}
                         <input type="checkbox" id="{{cuisine.name}}" name="cuisines" value="{{cuisine.name}}">
                         <label for="{{cuisine.name}}">{{cuisine.name}}</label><br>
                         {% endfor %}
-                    <!-- </div> -->
                 </div>
-                <div class="col-sm-12 col-md-4">
-                    <!-- <div class="form-group"> -->
+                <div class="col-12 col-md-4">
                         <h6>Refine your search by your specified diet(s)</h6>
                         {% for diet in user.diets %}
                         <input type="checkbox" id="{{diet.name}}" name="diets" value="{{diet.name}}">
                         <label for="{{diet.name}}">{{diet.name}}</label><br>
                         {% endfor %}
-                       <!-- </div> -->
                 </div>
             </div>
             <a href="/users/{{user.id}}/preferences"><p>Click here to update your fave cuisines and preferred diets</p></a>
@@ -49,7 +45,7 @@
                 <h5>Your Recipes</h5>
                 <div class="row d-flex">
                     {% for item in savedRecipes %}
-                    <div class="col-12 col-md-3">
+                    <div class="col-6 col-md-4 col-lg-3">
                         <div class="card" style="width: 15rem; margin: 1rem auto">
                           <div class="img-container">
                               <img class="card-img-top" src="{{item.image}}" alt="Card image cap">
@@ -113,22 +109,7 @@
                             </div>
                           </div>
                       </div>
-                    <!-- <div class="col-12 col-md-3">
-                        <div class="card" style="width: 15rem; margin: 1rem auto">
-                          <div class="img-container">
-                              <img class="card-img-top" src="{{item.image}}" alt="Card image cap">
-                              <div class="overlay minus text-center">
-                                  <a href="/delete_recipe/{{item.id}}"><i data-toggle="tooltip" data-placement="top" title="Delete from library" class="fa fa-minus-circle"></i></a>
-                              </div>
-                          </div>                      
-                          <div class="home card-body">
-                              <h6 class="home card-title text-center">{{item.title}}</h6>
-                              <hr/>
-                              <a href="/recipe/{{item.id}}"><p>View recipe details</p></a>                           
-                              <a href="/recipe/{{item.id}}/similar?page={{page.page}}"><p>Browse similar recipes</p></a>
-                            </div>
-                          </div>
-                      </div> -->
+              
                     {% endfor %}
                 </div>
          
