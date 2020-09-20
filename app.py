@@ -8,7 +8,7 @@ from models import db, connect_db, User, CreatedRecipe, SavedRecipe, CustomTag, 
 from forms import UserAddForm, UserEditForm, LoginForm
 import requests
 import os
-from keys import Keys
+# from keys import Keys
 
 CURR_USER_KEY = "curr_user"
 NO_RECIPES = "NO_RECIPES"
@@ -16,7 +16,8 @@ RECIPES = []
 OFFSET = 0
 
 SPOONACULAR_RECIPES_URL = "https://api.spoonacular.com/recipes"
-APIKEY = os.environ.get('APIKEY', "00ffcb33a5dd4c5cbbb677d9b035eeae")
+APIKEY = os.environ.get('APIKEY')
+# APIKEY = os.environ.get('APIKEY', Keys.spoonacular_api_key)
 
 app = Flask(__name__)
 
