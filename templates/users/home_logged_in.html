@@ -116,12 +116,12 @@
               </div>
               <div class="col-12">
                 <h5>Recently Viewed</h5>
-                <div id="carouselExampleSlidesOnly" class="carousel slide">
+                <div id="carouselRecentView" class="carousel slide">
                     <div class="carousel-inner w-100" role="listbox">
                         {% for item in session["recipes"] %} 
                         {% if item.image %} 
                         <div class="carousel-item {% if loop.index == 1 %} active{% endif %}">
-                            <div class="col-12 col-md-3">
+                            <div class="col-12 col-md-4">
                                 <div class="card" style="width: 15rem; margin: 1rem auto">
                                   <div class="img-container">
                                       <img class="card-img-top" src="{{item.image}}" alt="Card image cap">
@@ -149,10 +149,10 @@
                         {% endfor %}
                     </div>
                     <div class="controls text-center">
-                        <a class="home-icon left" href="#carouselExampleSlidesOnly" role="button" data-slide="prev"> 
+                        <a class="home-icon left" href="#carouselRecentView" role="button" data-slide="prev"> 
                             <i class="fa fa-arrow-left"></i>
                           </a> 
-                          <a class="home-icon right" href="#carouselExampleSlidesOnly" role="button" data-slide="next"> 
+                          <a class="home-icon right" href="#carouselRecentView" role="button" data-slide="next"> 
                             <i class="fa fa-arrow-right" style="text-align: right;"></i>
                           </a>
                     </div>
