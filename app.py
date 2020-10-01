@@ -185,8 +185,10 @@ def home():
         create_session_recipes()
 
         if len(session["recipes"]) == 0:
-            res = requests.get(f"{SPOONACULAR_RECIPES_URL}/random", params={"number":8, "apiKey": APIKEY}).json()
+            result = requests.get(f"{SPOONACULAR_RECIPES_URL}/random", params={"number":8, "apiKey": APIKEY})
+            print(f'total used: {result.headers["X-API-Quota-Used"]}, this call:{result.headers["X-API-Quota-Request"]}')
 
+            res = result.json()
             page["page"] = 1
 
 
@@ -228,7 +230,10 @@ def home():
         if not 'saved_recipes' in session:
             print('calling api for saved recipes')
             for item in saved_recipes:
-                specificRes = requests.get(f"{SPOONACULAR_RECIPES_URL}/{item.api_id}/information", params={"apiKey": APIKEY}).json()
+                specificResult = requests.get(f"{SPOONACULAR_RECIPES_URL}/{item.api_id}/information", params={"apiKey": APIKEY})
+                print(f'total used: {specificResult.headers["X-API-Quota-Used"]}, this call:{specificResult.headers["X-API-Quota-Request"]}')
+
+                specificRes = specificResult.json()
                 savedRecipes.append(specificRes)
 
             session['saved_recipes'] = savedRecipes
@@ -270,7 +275,10 @@ def browse():
 
         offset = OFFSET + ((page -1) * 20)   
 
-        res = requests.get(f"{SPOONACULAR_RECIPES_URL}/complexSearch", params={"offset": offset, "query":{searchArgs}, "intolerances": {intoleranceString}, "diet":{dietString}, "cuisine":{cuisineString}, "number":20, "sort": "popularity", "apiKey": APIKEY}).json()
+        result = requests.get(f"{SPOONACULAR_RECIPES_URL}/complexSearch", params={"offset": offset, "query":{searchArgs}, "intolerances": {intoleranceString}, "diet":{dietString}, "cuisine":{cuisineString}, "number":20, "sort": "popularity", "apiKey": APIKEY})
+        print(f'total used: {result.headers["X-API-Quota-Used"]}, this call:{result.headers["X-API-Quota-Request"]}')
+
+        res = result.json()
         if not res["results"]:
             print(res)
         else:
@@ -297,11 +305,16 @@ def browse():
 
         offset = OFFSET + ((page -1) * 20)   
 
-        res = requests.get(f"{SPOONACULAR_RECIPES_URL}/complexSearch", params={"offset": offset, "query":{searchArgs}, "intolerances": {intoleranceString}, "diet":{dietString}, "cuisine":{cuisineString}, "number":20, "sort": "popularity", "apiKey": APIKEY}).json()
+        result = requests.get(f"{SPOONACULAR_RECIPES_URL}/complexSearch", params={"offset": offset, "query":{searchArgs}, "intolerances": {intoleranceString}, "diet":{dietString}, "cuisine":{cuisineString}, "number":20, "sort": "popularity", "apiKey": APIKEY})
+        
+        print(f'total used: {result.headers["X-API-Quota-Used"]}, this call:{result.headers["X-API-Quota-Request"]}')
+
+        res = result.json()
         if not res["results"]:
             print(res)
         else:
             print("EVerything working fine")
+
 
         for item in res["results"]:
             searchRecipes.append(item)
@@ -311,8 +324,11 @@ def browse():
 
 @app.route("/recipe/<int:id>")
 def recipe_details(id):
-    res = requests.get(f"{SPOONACULAR_RECIPES_URL}/{id}/information", params={"includeNutrition": True, "apiKey": APIKEY}).json()
+    result = requests.get(f"{SPOONACULAR_RECIPES_URL}/{id}/information", params={"includeNutrition": True, "apiKey": APIKEY})
 
+    print(f'total used: {result.headers["X-API-Quota-Used"]}, this call:{result.headers["X-API-Quota-Request"]}')
+
+    res = result.json()
     if "curr_user" in session:
         user = User.query.get_or_404(session["curr_user"])
         helperRecipes = [c for c in user.saved_recipes if c.api_id == id]
@@ -347,8 +363,11 @@ def similar_recipes(id):
 
     offset = OFFSET + ((page -1) * 20)
 
-    res = requests.get(f"{SPOONACULAR_RECIPES_URL}/{id}/similar", params={"offset": offset, "number": 20, "apiKey": APIKEY}).json()
+    result = requests.get(f"{SPOONACULAR_RECIPES_URL}/{id}/similar", params={"offset": offset, "number": 20, "apiKey": APIKEY})
 
+    print(f'total used: {result.headers["X-API-Quota-Used"]}, this call:{result.headers["X-API-Quota-Request"]}')
+
+    res = result.json()
     if len(res) == 0 or not res:
         print(res)
     else:
@@ -380,7 +399,14 @@ def save_recipe(id):
 
         db.session.commit()
 
-        del session["saved_recipes"]
+        # Adding new saved recipe to session
+        getRecforSession = requests.get(f"{SPOONACULAR_RECIPES_URL}/{id}/information", params={"includeNutrition": True, "apiKey": APIKEY})
+
+        print(f'total used: {getRecforSession.headers["X-API-Quota-Used"]}, this call:{getRecforSession.headers["X-API-Quota-Request"]}')
+
+        res = getRecforSession.json()
+
+        session["saved_recipes"].append(res)
         flash("You successfully added this recipe to your library", 'success')
 
         return redirect("/")
@@ -399,7 +425,9 @@ def delete_recipe(id):
 
         db.session.commit()
 
-        del session["saved_recipes"]
+        for item in session['saved_recipes']:
+            if item['id'] == ID:
+                session["saved_recipes"].remove(item)
 
         flash("You successfully deleted this recipe from your library", 'success')
 
@@ -524,7 +552,11 @@ def user_hub(user_id):
         if not 'saved_recipes' in session:
             print('calling api for saved recipes')
             for item in saved_recipes:
-                specificRes = requests.get(f"{SPOONACULAR_RECIPES_URL}/{item.api_id}/information", params={"apiKey": APIKEY}).json()
+                specificResult = requests.get(f"{SPOONACULAR_RECIPES_URL}/{item.api_id}/information", params={"apiKey": APIKEY})
+                print(f'total used: {specificResult.headers["X-API-Quota-Used"]}, this call:{specificResult.headers["X-API-Quota-Request"]}')
+
+                specificRes = specificResult.json()
+               
                 savedRecipes.append(specificRes)
 
             session['saved_recipes'] = savedRecipes
@@ -615,9 +647,6 @@ def user_pref_form_edit(user_id):
             new_diets = form.diets.data
             new_intolerances = form.intolerances.data
 
-            print(f"hjghsdgghgagfffffffffffffffffffffffffffffffffffffffffff{exisitingfaveCuisines}")
-            print(new_fave_cuisines)
-
             for current in exisitingfaveCuisines:
                 if current.cuisines_id not in new_fave_cuisines:
                     deleted = FaveCuisines.query.filter(FaveCuisines.cuisines_id==current.cuisines_id, FaveCuisines.user_id==user.id).delete()
@@ -670,7 +699,11 @@ def user_library(user_id):
         if not 'saved_recipes' in session:
             print('calling api for saved recipes')
             for item in saved_recipes:
-                specificRes = requests.get(f"{SPOONACULAR_RECIPES_URL}/{item.api_id}/information", params={"apiKey": APIKEY}).json()
+                specificResult = requests.get(f"{SPOONACULAR_RECIPES_URL}/{item.api_id}/information", params={"apiKey": APIKEY})
+                
+                print(f'total used: {specificResult.headers["X-API-Quota-Used"]}, this call:{specificResult.headers["X-API-Quota-Request"]}')
+
+                specificRes = specificResult.json()
                 savedRecipes.append(specificRes)
 
             session['saved_recipes'] = savedRecipes
@@ -694,7 +727,5 @@ def user_library_sort(user_id):
     cuisinesRequest = request.args.getlist("cuisines")
     dietsRequest = request.args.getlist("diets")
     customsRequest = request.args.getlist("customs")
-
-    print(customsRequest)
 
     return render_template("users/library.html", user=user, savedRecipes=savedRecipes, DBSavedRecipes=DBSavedRecipes, page=page)
