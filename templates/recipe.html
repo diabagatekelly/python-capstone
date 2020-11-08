@@ -208,9 +208,9 @@
                 <div class="tab-pane fade" id="nutrition" role="tabpanel" aria-labelledby="nutrition-tab">
                     <div class="container-fluid mt-5">
                         <div class="row d-flex">
-                            <div class="col-3">
+                            <div class="col-6">
                                 <ul>
-                                    <h6><b>Cuisines:</b></h6> 
+                                    <h5><b><u>Cuisines:</u></b></h5> 
                                     {% if recipe.cuisines| length > 0 %}
                                     {% for cuisine in recipe.cuisines %}
                                     <li>{{cuisine}}</li>
@@ -218,10 +218,9 @@
                                     {% else %}
                                     <p>None listed</p>
                                     {% endif %}
-
                                 </ul>
                                 <ul>
-                                    <h6><b>Diets:</b></h6> 
+                                    <h5><b><u>Diets:</u></b></h5> 
                                     {% if recipe.diets| length > 0 %}
                                     {% for diet in recipe.diets %}
                                     <li>{{diet}}</li>
@@ -230,48 +229,80 @@
                                     <p>None listed</p>
                                     {% endif %}
                                 </ul>
-                            </div>
-                            <div class="col-4">
-                                <h6><b>Health Score: </b> {% if recipe.healthScore %}{{recipe.healthScore}}%{%else%} None listed{%endif%}</h6>
-                                <h6><b>Weight Watcher Smartpoints: </b> {% if recipe.weightWatcherSmartPoints %}{{recipe.weightWatcherSmartPoints}} pts{%else%} None listed{%endif%}</h6>
-                            </div>
-                            <div class="col-4">
+                                <ul>
+                                  <h5><b><u>Health Score:</u></b></h5>
+                                    {% if recipe.healthScore %}
+                                    <p>{{recipe.healthScore}}</p>
+                                    {%else%} 
+                                    <p>None listed</p>
+                                    {%endif%}
+                                </ul>
+                                <ul>
+                                  <h5><b><u>Weight Watcher Smartpoints:</u></b></h5>
+                                    {% if recipe.weightWatcherSmartPoints %}
+                                    <p>{{recipe.weightWatcherSmartPoints}} pts</p>
+                                    {%else%}
+                                    <p>None listed</p>
+                                    {%endif%}
+                                </ul>
                                 <div class="row d-flex">
-                                    {% if recipe.dairyFree %}
-                                    <div class="col">
-                                        <div class="badge">Dairy Free <i class="fa fa-check"></i></div>
-                                    </div>
-                                    {%endif%}
-                                    {% if recipe.glutenFree %}
-                                    <div class="col">
-                                        <div class="badge">Gluten Free <i class="fa fa-check"></i></div>
-                                    </div>
-                                    {%endif%}
-                                    {% if recipe.ketogenic %}
-                                    <div class="col">
-                                        <div class="badge">Ketogenic <i class="fa fa-check"></i></div>
-                                    </div>
-                                    {%endif%}
-                                    {% if recipe.vegan %}
-                                    <div class="col">
-                                        <div class="badge">Vegan <i class="fa fa-check"></i></div>
-                                    </div>
-                                    {%endif%}
-                                    {% if recipe.vegetarian %}
-                                    <div class="col">
-                                        <div class="badge">Vegetarian <i class="fa fa-check"></i></div>
-                                    </div>
-                                    {%endif%}
-                                    {% if recipe.whole30 %}
-                                    <div class="col">
-                                        <div class="badge">Whole 30 <i class="fa fa-check"></i></div>
-                                    </div>
-                                    {%endif%}
-                                </div>
+                                  <div class="col-12">
+                                    <ul>
+                                      <h5><b><u>Health Labels:</u></b></h5> 
+                                    </ul>
+                                  </div>
+                                  <ul>
+                                  {% if not recipe.dairyFree or recipe.glutenFree or recipe.ketogenic or recipe.vegan or recipe.vegetarian or recipe.whole30  %}  
+                                  <div class="col">
+                                    <p>None</i></p>
+                                  </div>
+                                  {% endif %}
+                                  {% if recipe.dairyFree %}
+                                  <div class="col">
+                                      <div class="badge">Dairy Free <i class="fa fa-check"></i></div>
+                                  </div>
+                                  {%endif%}
+                                  {% if recipe.glutenFree %}
+                                  <div class="col">
+                                      <div class="badge">Gluten Free <i class="fa fa-check"></i></div>
+                                  </div>
+                                  {%endif%}
+                                  {% if recipe.ketogenic %}
+                                  <div class="col">
+                                      <div class="badge">Ketogenic <i class="fa fa-check"></i></div>
+                                  </div>
+                                  {%endif%}
+                                  {% if recipe.vegan %}
+                                  <div class="col">
+                                      <div class="badge">Vegan <i class="fa fa-check"></i></div>
+                                  </div>
+                                  {%endif%}
+                                  {% if recipe.vegetarian %}
+                                  <div class="col">
+                                      <div class="badge">Vegetarian <i class="fa fa-check"></i></div>
+                                  </div>
+                                  {%endif%}
+                                  {% if recipe.whole30 %}
+                                  <div class="col">
+                                      <div class="badge">Whole 30 <i class="fa fa-check"></i></div>
+                                  </div>
+                                  {%endif%}
+                                </ul>
+                              </div>
                             </div>
-                        </div>
-                        <div class="row d-flex">
-                            {{recipe.nutrition}}
+                       
+                            <div class="col-6">
+                              <div class="row d-flex">
+                                <div class="col-12">
+                                  <h5><b><u>Nutrition Facts (per 1 serving):</u></b></h5>
+                                </div>
+                                <div class="col-12">
+                                  {% for x in recipe.nutrition.nutrients %}
+                                  <p><b>{{x.title}}: </b>{{x.amount}} {{x.unit}}</p>
+                                  {% endfor %}                                
+                                </div>
+                              </div>
+                            </div>
                         </div>
                     </div>
                 </div>

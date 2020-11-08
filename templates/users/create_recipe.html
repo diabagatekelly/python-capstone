@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Recipe{% endblock %}
+
+{% block content %}
+<div class="row d-flex align-items-center hub-header">
+  <div class="col-12">
+    <div class="jumbotron jumbotron-fluid align-items-center">
+      <div class="container">
+        <h1 class="display-4 text-center">Hello, {{user.first_name}}!</h1>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="row d-flex align-items-top user_hub">
+    <div class="col-2">
+      <div class="nav flex-column nav-tabs" id="create-recipe-tab" role="tablist" aria-orientation="vertical">
+        <a class="nav-link" href="/users/{{user.id}}/hub" role="tab" aria-controls="recently-saved" aria-selected="false">Recently Saved/Created</a>
+        <a class="nav-link active"  href="#create-recipe" role="tab" aria-controls="create-recipe" aria-selected="true" data-toggle="tab" id="create-recipe">Create Recipe</a>
+        <a class="nav-link" href="/users/{{user.id}}/preferences" role="tab" aria-controls="edit-prefs" aria-selected="false">Edit Search Preferences</a>
+        <a class="nav-link" href="/users/{{user.id}}/library" role="tab" aria-controls="library" aria-selected="false">View Full Library</a>
+      </div>
+    </div>
+    <div class="col-10 pt-5">
+      <div class="tab-content" id="create-recipe-tab">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, msg in messages %}
+            <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+      {% endwith %}
+      <div class="tab-pane active" id="create-recipe" role="tabpanel" aria-labelledby="create-recipe-tab">
+        <h5 class="text-center">Create a new recipe</h5>
+      
+      <form enctype="multipart/form-data" method="POST" action="create-recipe" id="create-recipe" style="width: 75%; margin: 0 auto">
+          {{ form.hidden_tag() }}
+
+          {% for field in form if field.widget.input_type != 'hidden' %}
+          {% for error in field.errors %}
+              <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {% if field is not none %}
+            <label style="font-weight: bold; font-size: 16px" for={{field.label.text}}>{{field.label.text}}</label>
+            {{ field(class="form-control mb-3") }}
+            
+            {% endif %}
+          {% endfor %}
+
+
+          <button style="width:100%" class="btn btn-primary">Submit</button>
+
+        </form>
+      </div>
+      </div>
+    </div>
+ 
+   
+  </div>
+
+{% endblock %}

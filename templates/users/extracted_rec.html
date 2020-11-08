@@ -1,0 +1,288 @@
+
+
+
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid p-5">
+    <div class="row d-flex">
+        <div class="col-sm-12 col-md-6">
+            <h1><a href="/extract-recipe?saved=true"><i style="color: green" data-toggle="tooltip" data-placement="top" title="Create copy for my library" class="fa fa-plus-circle"></i></a>{{title}}</h1>
+            <h6 class="mt-3"><b>Source: </b><a href='https://{{source}}' target="_blank"><span>{{source}}</span></a></h6>
+            <h6 class="mb-2 mt-5"><span><b>Ready In:</b> {{total_time}} min.</span> | <span><b>Calories: </b> {{(recipe.calories/yields |int)|round|int}}</span> </h6>
+      
+            <a href="/extract-recipe?saved=true" class="btn btn-success">Create Copy For My Library</a>
+            
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <img src="{{image}}" class="img-fluid">
+        </div>
+
+    </div>
+    <hr/>
+    <div class="row d-flex mt-5">
+        <div class="col-12">
+              <ul class="nav nav-pills" id="myTab" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link active" id="ingredients-tab" data-toggle="tab" href="#ingredients" role="tab" aria-controls="ingredients" aria-selected="true">Ingredients</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="directions-tab" data-toggle="tab" href="#directions" role="tab" aria-controls="directions" aria-selected="false">Directions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="nutrition-tab" data-toggle="tab" href="#nutrition" role="tab" aria-controls="nutrition" aria-selected="false">Nutrition</a>
+                  </li>
+              </ul>
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="ingredients" role="tabpanel" aria-labelledby="ingredient-tab">
+                  <div class="container-fluid mt-5">
+                      <div class="row d-flex">
+                          <div class="col-sm-12 col-md-8">
+                              <h2>Ingredients</h2>
+                          </div>
+                          <div class="col-sm-12 col-md-2">
+                            <h6><b>Servings: </b> {{yields}}</h6>
+                        </div>
+                        <div class="col-12">
+                          <ul>
+                            {% for ingr in ingredients %}
+                              <li>{{ingr}}</li>
+                            {%endfor%}
+                          </ul>                         
+                      </div>
+                      </div>
+                   
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="directions" role="tabpanel" aria-labelledby="directions-tab">
+                    <div class="container-fluid mt-5">
+                        <div class="row d-flex">
+                            <div class="col-12">
+                                <h2>Directions</h2>
+                                <div id="recipe-directions">
+                                    {{instructions}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nutrition" role="tabpanel" aria-labelledby="nutrition-tab">
+                  <div class="container-fluid mt-5">
+                      <div class="row d-flex">
+                          <div class="col-6">
+                              <ul>
+                                  <h5><b><u>Cuisines:</u></b></h5> 
+                                  {% if recipe.cuisines| length > 0 %}
+                                  {% for cuisine in recipe.cuisines %}
+                                  <li>{{cuisine}}</li>
+                                  {% endfor %}
+                                  {% else %}
+                                  <p>None listed</p>
+                                  {% endif %}
+                              </ul>
+                              <ul>
+                                  <h5><b><u>Diets:</u></b></h5> 
+                                  {% if recipe.diets| length > 0 %}
+                                  {% for diet in recipe.diets %}
+                                  <li>{{diet}}</li>
+                                  {% endfor %}
+                                  {% else %}
+                                  <p>None listed</p>
+                                  {% endif %}
+                              </ul>
+                              <ul>
+                                <h5><b><u>Weight Watcher Smartpoints:</u></b></h5>
+                                  {% if recipe.weightWatcherSmartPoints %}
+                                  <p>{{recipe.weightWatcherSmartPoints}} pts</p>
+                                  {%else%} 
+                                  <p>None listed</p>
+                                  {%endif%}
+                              </ul>
+                              <div class="row d-flex">
+                                <div class="col-12">
+                                  <ul>
+                                    <h5><b><u>Health Labels:</u></b></h5> 
+                                  </ul>
+                                </div>
+                                <ul>
+                                {% if 'DAIRY_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Dairy Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'GLUTEN_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Gluten Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'FAT_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Fat Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'VEGAN' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Vegan <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'VEGETARIAN' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Vegetarian <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'LOW_FAT' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Low Fat <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'PESCATARIAN' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Pescatarian <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'PALEO' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Paleo <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'WHEAT_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Wheat Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'EGG_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Egg Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'PEANUT_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Peanut Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'TREE_NUT_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Tree Nut Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'SOY_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Soy Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'FISH_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Fish Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'SHELLFISH_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Shellfish Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'PORK_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Pork Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'RED_MEAT_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Red Meat Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'ALCOHOL_FREE' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Alcohol Free <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'NO_OIL_ADDED' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">No Oil Added <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'NO_SUGAR_ADDED' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">No Sugar Added <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'KOSHER' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Kosher <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'NO_OIL_ADDED' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">No Oil Added <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'HIGH_FIBER' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">High Fiber <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'HIGH_PROTEIN' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">High Protein <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'LOW_CARB' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Low Carb <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                                {% if 'LOW_SODIUM' in recipe.healthLabels %}
+                                <div class="col-6">
+                                    <div class="badge">Low Sodium <i class="fa fa-check"></i></div>
+                                </div>
+                                {%endif%}
+                              </ul>
+                            </div>
+                            </div>
+                            <div class="col-6">
+                              <div class="row d-flex">
+                                <div class="col-12">
+                                  <h5><b><u>Nutrition Facts (per 1 serving):</u></b></h5>
+                                </div>
+                                <div class="col-6">
+                                  <p><b>Calories: </b>{{(recipe.calories/yields |int)|round|int}} Cal.</p>
+                                  <p><b>Total Fat: </b>{{(recipe.fat/(yields | int))|round|int}}g</p>
+                                  <p><b>-----Saturated Fat: </b>{{(recipe.sat_fat/(yields | int))|round|int}}g</p>
+                                  <p><b>-----Trans Fat: </b>{{(recipe.trans_fat/(yields | int))|round|int}}g</p>
+                                  <p><b>-----Polyunsaturated Fat: </b>{{(recipe.poly_fat/(yields | int))|round|int}}g</p>
+                                  <p><b>-----Monounsaturated Fat: </b>{{(recipe.trans_fat/(yields | int))|round|int}}g</p>
+                                  <p><b>Cholesterol: </b>{{(recipe.cholesterol/(yields | int))|round|int}}mg</p>
+                                  <p><b>Sodium: </b>{{(recipe.sodium/(yields | int))|round|int}}mg</p>
+                                  <p><b>Carbs: </b>{{(recipe.carbs/(yields | int))|round|int}}g</p>
+                                  <p><b>-----Fiber: </b>{{(recipe.fiber/(yields | int))|round|int}}g</p>
+                                  <p><b>-----Sugar: </b>{{(recipe.sugar/(yields | int))|round|int}}g</p>
+                                  <p><b>Protein: </b>{{(recipe.protein/(yields | int))|round|int}}g</p>    
+                                </div>
+                                <div class="col-6">
+                                  <p><b>Vitamin D: </b>{{(recipe.vit_D/(yields | int))|round|int}}%</p>
+                                  <p><b>Calcium: </b>{{(recipe.calcium/(yields | int))|round|int}}%</p>
+                                  <p><b>Iron: </b>{{(recipe.iron/(yields | int))|round|int}}%</p>
+                                  <p><b>Potassium: </b>{{(recipe.potassium/(yields | int))|round|int}}mg</p>
+                                  <p><b>Vitamin A: </b>{{(recipe.vit_A/(yields | int))|round|int}}%</p>
+                                  <p><b>Vitamin C: </b>{{(recipe.vit_C/(yields | int))|round|int}}%</p>
+                                </div>
+                              </div>
+                            </div>
+                          
+                              
+                      </div>
+                    
+                  </div>
+              </div>
+              </div>
+              
+        </div>
+
+    </div>
+</div>
+
+
+
+{% endblock %}

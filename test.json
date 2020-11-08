@@ -1,0 +1,182 @@
+{'vegetarian': True, 
+'vegan': False, 
+'glutenFree': False, 
+'dairyFree': True, 
+'veryHealthy': False, 
+'cheap': False, 
+'veryPopular': False, 
+'sustainable': False, 
+'weightWatcherSmartPoints': 17, 
+'gaps': 'no', 
+'lowFodmap': False, 
+'preparationMinutes': 15, 
+'cookingMinutes': 30, 
+'aggregateLikes': 1, 
+'spoonacularScore': 22.0, 
+'healthScore': 2.0, 
+'pricePerServing': 52.64, 
+'extendedIngredients': 
+[
+        {'id': 18371, 'aisle': 'Baking', 'image': 'white-powder.jpg', 'consistency': 'solid', 'name': 'baking powder', 'original': '2 teaspoons baking powder', 'originalString': '2 teaspoons baking powder', 'originalName': 'baking powder', 'amount': 2.0, 'unit': 'teaspoons', 'meta': [], 'metaInformation': [], 'measures': {'us': {'amount': 2.0, 'unitShort': 'tsps', 'unitLong': 'teaspoons'
+                }, 'metric': {'amount': 2.0, 'unitShort': 'tsps', 'unitLong': 'teaspoons'
+                }
+            }
+        },
+        {'id': 18372, 'aisle': 'Baking', 'image': 'white-powder.jpg', 'consistency': 'solid', 'name': 'baking soda', 'original': '1½ teaspoons baking soda', 'originalString': '1½ teaspoons baking soda', 'originalName': 'baking soda', 'amount': 1.5, 'unit': 'teaspoons', 'meta': [], 'metaInformation': [], 'measures': {'us': {'amount': 1.5, 'unitShort': 'tsps', 'unitLong': 'teaspoons'
+                }, 'metric': {'amount': 1.5, 'unitShort': 'tsps', 'unitLong': 'teaspoons'
+                }
+            }
+        },
+        {'id': 12118, 'aisle': 'Canned and Jarred;Milk, Eggs, Other Dairy', 'image': 'coconut-milk.png', 'consistency': 'liquid', 'name': 'coconut milk', 'original': '1 cup milk, buttermilk, almond, or coconut milk', 'originalString': '1 cup milk, buttermilk, almond, or coconut milk', 'originalName': 'milk, buttermilk, almond, or coconut milk', 'amount': 1.0, 'unit': 'cup', 'meta': [], 'metaInformation': [], 'measures': {'us': {'amount': 1.0, 'unitShort': 'cup', 'unitLong': 'cup'
+                }, 'metric': {'amount': 236.588, 'unitShort': 'ml', 'unitLong': 'milliliters'
+                }
+            }
+        },
+        {'id': 4047, 'aisle': 'Health Foods;Baking', 'image': 'oil-coconut.jpg', 'consistency': 
+'liquid', 'name': 'coconut oil', 'original': '½ cup vegetable, canola oil, or melted coconut oil', 'originalString': '½ cup vegetable, canola oil, or melted coconut oil', 'originalName': 'vegetable, canola oil, or melted coconut oil', 'amount': 0.5, 'unit': 'cup', 'meta': ['melted'
+            ], 'metaInformation': ['melted'
+            ], 'measures': {'us': {'amount': 0.5, 'unitShort': 'cups', 'unitLong': 'cups'
+                }, 'metric': {'amount': 118.294, 'unitShort': 'ml', 'unitLong': 'milliliters'
+                }
+            }
+        },
+        {'id': 1123, 'aisle': 'Milk, Eggs, Other Dairy', 'image': 'egg.png', 'consistency': 'solid', 'name': 'eggs', 'original': '2 large eggs', 'originalString': '2 large eggs', 'originalName': 'eggs', 'amount': 2.0, 'unit': 'large', 'meta': [], 'metaInformation': [], 'measures': {'us': {'amount': 2.0, 'unitShort': 'large', 'unitLong': 'larges'
+                }, 'metric': {'amount': 2.0, 'unitShort': 'large', 'unitLong': 'larges'
+                }
+            }
+        },
+        {'id': 10014214, 'aisle': 'Tea and Coffee', 'image': 'instant-coffee-or-instant-espresso.png', 'consistency': 'solid', 'name': 'espresso powder', 'original': '1 teaspoon espresso powder', 'originalString': '1 teaspoon espresso powder', 'originalName': 'espresso powder', 'amount': 1.0, 'unit': 'teaspoon', 'meta': [], 'metaInformation': [], 'measures': {'us': {'amount': 1.0, 'unitShort': 'tsp', 'unitLong': 'teaspoon'
+                }, 'metric': {'amount': 1.0, 'unitShort': 'tsp', 'unitLong': 'teaspoon'
+                }
+            }
+        },
+        {'id': 20081, 'aisle': 'Baking', 'image': 'flour.png', 'consistency': 'solid', 'name': 'flour', 'original': '2 cups all-purpose flour', 'originalString': '2 cups all-purpose flour', 'originalName': 'all-purpose flour', 'amount': 2.0, 'unit': 'cups', 'meta': ['all-purpose'
+            ], 'metaInformation': ['all-purpose'
+            ], 'measures': {'us': {'amount': 2.0, 'unitShort': 'cups', 'unitLong': 'cups'
+                }, 'metric': {'amount': 473.176, 'unitShort': 'ml', 'unitLong': 'milliliters'
+                }
+            }
+        },
+        {'id': 2047, 'aisle': 'Spices and Seasonings', 'image': 'salt.jpg', 'consistency': 'solid', 'name': 'salt', 'original': '1 teaspoon salt', 'originalString': '1 teaspoon salt', 'originalName': 'salt', 'amount': 1.0, 'unit': 'teaspoon', 'meta': [], 'metaInformation': [], 'measures': {'us': {'amount': 1.0, 'unitShort': 'tsp', 'unitLong': 'teaspoon'
+                }, 'metric': {'amount': 1.0, 'unitShort': 'tsp', 'unitLong': 'teaspoon'
+                }
+            }
+        },
+        {'id': 19335, 'aisle': 'Baking', 'image': 'sugar-in-bowl.png', 'consistency': 'solid', 'name': 'sugar', 'original': '2 cups sugar', 'originalString': '2 cups sugar', 'originalName': 'sugar', 'amount': 2.0, 'unit': 'cups', 'meta': [], 'metaInformation': [], 'measures': {'us': {'amount': 2.0, 'unitShort': 'cups', 'unitLong': 'cups'
+                }, 'metric': {'amount': 473.176, 'unitShort': 'ml', 'unitLong': 'milliliters'
+                }
+            }
+        },
+        {'id': 19165, 'aisle': 'Baking', 'image': 'cocoa-powder.png', 'consistency': 'solid', 'name': 'unsweetened cocoa powder', 'original': '¾ cup unsweetened cocoa powder', 'originalString': '¾ cup unsweetened cocoa powder', 'originalName': 'unsweetened cocoa powder', 'amount': 0.75, 'unit': 'cup', 'meta': ['unsweetened'
+            ], 'metaInformation': ['unsweetened'
+            ], 'measures': {'us': {'amount': 0.75, 'unitShort': 'cups', 'unitLong': 'cups'
+                }, 'metric': {'amount': 177.441, 'unitShort': 'ml', 'unitLong': 'milliliters'
+                }
+            }
+        },
+        {'id': 2050, 'aisle': 'Baking', 'image': 'vanilla-extract.jpg', 'consistency': 'liquid', 'name': 'vanilla extract', 'original': '2 teaspoons vanilla extract', 'originalString': '2 teaspoons vanilla extract', 'originalName': 'vanilla extract', 'amount': 2.0, 'unit': 'teaspoons', 'meta': [], 'metaInformation': [], 'measures': {'us': {'amount': 2.0, 'unitShort': 'tsps', 'unitLong': 'teaspoons'
+                }, 'metric': {'amount': 2.0, 'unitShort': 'tsps', 
+'unitLong': 'teaspoons'
+                }
+            }
+        },
+        {'id': 14412, 'aisle': 'Beverages', 'image': 'water.png', 'consistency': 'liquid', 'name': 'water', 'original': '1 cup boiling water', 'originalString': '1 cup boiling water', 'originalName': 'boiling water', 'amount': 1.0, 'unit': 
+'cup', 'meta': ['boiling'
+            ], 'metaInformation': ['boiling'
+            ], 'measures': {'us': {'amount': 1.0, 'unitShort': 'cup', 'unitLong': 'cup'
+                }, 'metric': {'amount': 236.588, 'unitShort': 'ml', 'unitLong': 'milliliters'
+                }
+            }
+        }
+    ], 
+    'id': 876110, 
+    'title': 'The Best Chocolate Cake', 'readyInMinutes': 45, 'servings': 12, 'sourceUrl': 'https: //addapinch.com/the-best-chocolate-cake-recipe-ever/', 'image': 'https://spoonacular.com/recipeImages/876110-556x370.jpg', 'imageType': 'jpg', 'summary': 'Need a <b>dairy free and vegetarian dessert</b>? The Best Chocolate Cake could be an awesome recipe to try. This recipe makes 12 servings with <b>346 calories</b>, <b>5g of protein</b>, and <b>15g of fat</b> each. For <b>51 cents per serving</b>, this recipe <b>covers 7%</b> of your daily requirements of vitamins and minerals. 1 person were impressed by this recipe. Head to the store and pick up coconut oil, flour, eggs, and a few other things to make it today. From preparation to the plate, this recipe takes approximately <b>45 minutes</b>. All things considered, we decided this recipe <b>deserves a spoonacular score of 0%</b>. This score is improvable. Try <a href="https://spoonacular.com/recipes/confession-64-im-cake-deprived-chocolate-cake-with-cream-cheese-frosting-and-satiny-chocolate-glaze-542413">Confession #64: I’m Cake Deprived… Chocolate Cake with Cream Cheese Frosting and Satiny Chocolate Glaze</a>, <a href="https://spoonacular.com/recipes/chocolate-birthday-cake-devils-food-cake-with-rich-chocolate-buttercream-frosting-575673">Chocolate Birthday Cake: Devil’s Food Cake with Rich Chocolate Buttercream Frosting</a>, and <a href="https://spoonacular.com/recipes/easy-kids-birthday-cake-chocolate-cake-with-chocolate-buttercream-frosting-559164">Easy Kids Birthday Cake: Chocolate Cake with Chocolate Buttercream Frosting</a> for similar recipes.', 'cuisines': [], 'dishTypes': ['side dish'], 'diets': ['dairy free', 'lacto ovo vegetarian'], 'occasions': [], 'instructions': 'Preheat oven to 350 F. Prepare two 9-inch cake pans by spraying with baking spray or buttering and 
+lightly flouring.Add flour, sugar, cocoa, baking powder, baking soda, salt and espresso powder to a large bowl or the bowl of a stand mixer. Whisk through to combine or, using your paddle attachment, stir through flour mixture until combined well.Add milk, vegetable oil, eggs, and vanilla to flour mixture and mix together on medium speed until well combined. Reduce speed and carefully add boiling water to the cake batter until well combined.Distribute cake batter evenly between the two prepared cake pans. Bake for 
+30-35 minutes, until a toothpick or cake tester inserted in the center of the chocolate cake comes out clean.Remove from the oven 
+and allow to cool for about 10 minutes, remove from the pan and cool completely.Frost cake with Chocolate Buttercream Frosting.', 
+'analyzedInstructions': [
+        {'name': '', 'steps': [
+                {'number': 1, 'step': 'Preheat oven to 350 F. Prepare two 9-inch cake pans by spraying with baking spray or buttering and lightly flouring.', 'ingredients': [
+                        {'id': 0, 'name': 'baking spray', 'localizedName': 'baking spray', 'image': 'cooking-spray.png'
+                        }
+                    ], 'equipment': [
+                        {'id': 404784, 'name': 'oven', 'localizedName': 'oven', 'image': 'oven.jpg', 'temperature': {'number': 350.0, 'unit': 'Fahrenheit'
+                            }
+                        }
+                    ]
+                },
+                {'number': 2, 'step': 'Add flour, sugar, cocoa, baking powder, baking soda, salt and espresso powder to a large bowl or the bowl of a stand mixer.', 'ingredients': [
+                        {'id': 10014214, 'name': 'instant espresso', 'localizedName': 'instant espresso', 'image': 'instant-coffee-or-instant-espresso.png'
+                        },
+                        {'id': 18369, 'name': 'baking powder', 'localizedName': 'baking powder', 'image': 'white-powder.jpg'
+                        },
+                        {'id': 18372, 'name': 'baking soda', 'localizedName': 'baking soda', 'image': 'white-powder.jpg'
+                        },
+                        {'id': 19165, 'name': 'cocoa powder', 'localizedName': 'cocoa powder', 'image': 'cocoa-powder.png'
+                        },
+                        {'id': 20081, 'name': 'all purpose flour', 'localizedName': 'all purpose flour', 'image': 'flour.png'
+                        },
+                        {'id': 19335, 'name': 'sugar', 'localizedName': 'sugar', 'image': 'sugar-in-bowl.png'
+                        },
+                        {'id': 2047, 'name': 'salt', 'localizedName': 'salt', 'image': 'salt.jpg'
+                        }
+                    ], 'equipment': [
+                        {'id': 404665, 'name': 'stand mixer', 'localizedName': 'stand mixer', 'image': 'stand-mixer.jpg'
+                        },
+                        {'id': 404783, 'name': 'bowl', 'localizedName': 'bowl', 'image': 'bowl.jpg'
+                        }
+                    ]
+                },
+                {'number': 3, 'step': 'Whisk through to combine or, using your paddle attachment, stir through flour mixture until combined well.', 'ingredients': [
+                        {'id': 20081, 'name': 'all purpose flour', 'localizedName': 'all purpose flour', 'image': 'flour.png'
+                        }
+                    ], 'equipment': [
+                        {'id': 404661, 'name': 'whisk', 'localizedName': 'whisk', 'image': 'whisk.png'
+                        }
+                    ]
+                },
+                {'number': 4, 'step': 'Add milk, vegetable oil, eggs, and vanilla to flour mixture and mix together on medium speed until well combined. Reduce speed and carefully add boiling water to the cake batter until well combined.Distribute cake batter evenly between the two prepared cake pans.', 'ingredients': [
+                        {'id': 4513, 'name': 'vegetable oil', 'localizedName': 'vegetable oil', 'image': 'vegetable-oil.jpg'
+                        },
+                        {'id': 1052050, 'name': 'vanilla', 'localizedName': 'vanilla', 
+'image': 'vanilla.jpg'
+                        },
+                        {'id': 20081, 'name': 'all purpose flour', 'localizedName': 'all purpose flour', 'image': 'flour.png'
+                        },
+                        {'id': 14412, 'name': 'water', 'localizedName': 'water', 'image': 'water.png'
+                        },
+                        {'id': 1123, 'name': 'egg', 'localizedName': 'egg', 'image': 'egg.png'
+                        },
+                        {'id': 1077, 'name': 'milk', 'localizedName': 'milk', 'image': 'milk.png'
+                        }
+                    ], 'equipment': []
+                },
+                {'number': 5, 'step': 'Bake for 30-35 minutes, until a toothpick or cake tester inserted in the center of the chocolate cake comes out clean.', 'ingredients': [
+                        {'id': 19081, 'name': 'chocolate', 'localizedName': 'chocolate', 'image': 'milk-chocolate.jpg'
+                        }
+                    ], 'equipment': [
+                        {'id': 404644, 'name': 'toothpicks', 'localizedName': 'toothpicks', 'image': 'toothpicks.jpg'
+                        },
+                        {'id': 404784, 'name': 'oven', 'localizedName': 'oven', 'image': 'oven.jpg'
+                        }
+                    ], 'length': {'number': 35, 'unit': 'minutes'
+                    }
+                },
+                {'number': 6, 'step': 'Remove from the oven and allow to cool for about 10 minutes, remove from the pan and cool completely.Frost cake with Chocolate Buttercream Frosting.', 'ingredients': [
+                        {'id': 19081, 'name': 'chocolate', 'localizedName': 'chocolate', 'image': 'milk-chocolate.jpg'
+                        },
+                        {'id': 19230, 'name': 'frosting', 'localizedName': 'frosting', 'image': 'vanilla-frosting.png'
+                        }
+                    ], 'equipment': [
+                        {'id': 404784, 'name': 'oven', 
+'localizedName': 'oven', 'image': 'oven.jpg'
+                        },
+                        {'id': 404645, 'name': 'frying pan', 'localizedName': 'frying pan', 'image': 'pan.png'
+                        }
+                    ], 'length': {'number': 10, 'unit': 'minutes'
+                    }
+                }
+            ]
+        }
+    ], 'sourceName': None, 'creditsText': None, 'originalId': None
+}

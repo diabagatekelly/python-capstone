@@ -1,14 +1,19 @@
 from datetime import timedelta
-from flask import Flask, request, render_template, redirect, flash, session, g, jsonify
+from flask import Flask, request, render_template, redirect, flash, session, g, jsonify, json
 from werkzeug.exceptions import HTTPException
+from werkzeug.utils import secure_filename
 from flask_session import Session
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from models import db, connect_db, User, CreatedRecipe, SavedRecipe, CustomTag, Cuisine, Diet, Intolerance, FaveSavedRecipes, FaveCreatedRecipes, UserCustomTags, FaveCuisines, FaveDiets, FoodIntolerances, UserSavedRecipesCustom, UserSavedRecipesCuisine, UserCreatedRecipesCustom, UserCreatedRecipesCuisine, UserSavedRecipesDiet, UserCreatedRecipesDiet
-from forms import UserAddForm, UserEditForm, LoginForm
+from forms import UserAddForm, UserEditForm, LoginForm, CreateRecipeForm
 import requests
 import os
+import re
+import ast
 # from keys import Keys
+from recipe_scrapers import scrape_me
+
 
 CURR_USER_KEY = "curr_user"
 NO_RECIPES = "NO_RECIPES"
@@ -16,8 +21,16 @@ RECIPES = []
 OFFSET = 0
 
 SPOONACULAR_RECIPES_URL = "https://api.spoonacular.com/recipes"
+EDAMAM_URL = "https://api.edamam.com/api/nutrition-details"
+
 APIKEY = os.environ.get('APIKEY')
 # APIKEY = os.environ.get('APIKEY', Keys.spoonacular_api_key)
+
+EDAMAM_APP_ID = os.environ.get('EDAMAM_APP_ID')
+# EDAMAM_APP_ID = os.environ.get('EDAMAM_APP_ID', Keys.edamam_app_id)
+
+EDAMAM_APP_KEY = os.environ.get('EDAMAM_APP_KEY')
+# EDAMAM_APP_KEY = os.environ.get('EDAMAM_APP_KEY', Keys.edamam_app_key)
 
 app = Flask(__name__)
 
@@ -71,6 +84,8 @@ def do_logout():
         del session["saveRecipe"]
     if "saved_recipes" in session:
         del session["saved_recipes"]
+    if "created_recipes" in session:
+        del session["created_recipes"]
 
 @app.errorhandler(404)
 def not_found_error(error):
@@ -226,6 +241,7 @@ def home():
         page["page"] = 1
 
         saved_recipes = user.saved_recipes
+        created_recipes = user.created_recipes
 
         if not 'saved_recipes' in session:
             print('calling api for saved recipes')
@@ -241,11 +257,21 @@ def home():
             print('calling session for saved recipes')
             savedRecipes = session['saved_recipes']
 
+        if not 'created_recipes' in session:
+            print('calling db for created recipes')
+            for item in created_recipes:
+                createdRecipes.append(item)
+
+            session['created_recipes'] = createdRecipes
+        elif 'created_recipes' in session:
+            print('calling session for created recipes')
+            createdRecipes = session['created_recipes']
+
+        print(session["created_recipes"])
         DBSavedRecipes = saved_recipes
+        DBCreatedRecipes = created_recipes
 
-        created_recipes = user.created_recipes
-
-        return render_template("users/home_logged_in.html", user=user, savedRecipes=savedRecipes, createdRecipes=createdRecipes, DBSavedRecipes=DBSavedRecipes, page=page)
+        return render_template("users/home_logged_in.html", user=user, savedRecipes=savedRecipes, createdRecipes=createdRecipes, DBSavedRecipes=DBSavedRecipes, DBCreatedRecipes=DBCreatedRecipes, page=page)
 
 # BROWSING 
 @app.route("/browse")
@@ -354,6 +380,39 @@ def recipe_details(id):
     else:
         return render_template("recipe.html", recipe=res, helperRecipes=[])
 
+@app.route('/users/<int:user_id>/created-recipe/<int:id>')
+def created_recipe(user_id, id):
+    if "curr_user" in session:
+        user = User.query.get_or_404(user_id)
+        recipe = CreatedRecipe.query.get_or_404(id)
+        helperRecipes = [c for c in user.created_recipes if c.id == id]
+
+        recipeLinkedCuisines = UserCreatedRecipesCuisine.query.filter(UserCreatedRecipesCuisine.user_id==user_id, UserCreatedRecipesCuisine.recipe_id==helperRecipes[0].id).all()
+        recipeLinkedDiets = UserCreatedRecipesDiet.query.filter(UserCreatedRecipesDiet.user_id==user_id, UserCreatedRecipesDiet.recipe_id==helperRecipes[0].id).all()
+        recipeLinkedCustoms = UserCreatedRecipesCustom.query.filter(UserCreatedRecipesCustom.user_id==user_id, UserCreatedRecipesCustom.recipe_id==helperRecipes[0].id).all()
+
+        form = UserEditForm()
+
+        cuisines = db.session.query(Cuisine.id, Cuisine.name)
+        diets = db.session.query(Diet.id, Diet.name)
+        displayCustoms = db.session.query(CustomTag.id, CustomTag.name)
+
+        form.fave_cuisines.choices = cuisines
+        form.diets.choices = diets
+        form.displayCustoms.choices = displayCustoms
+       
+        form.fave_cuisines.data = [(c.cuisine_id) for c in recipeLinkedCuisines]
+        form.diets.data = [(c.diet_id) for c in recipeLinkedDiets ]
+        form.displayCustoms.data = [(c.custom_id) for c in recipeLinkedCustoms ]
+
+
+        return render_template("users/created_recipe.html", user=user, recipe=recipe, form=form, helperRecipes=helperRecipes)
+    else:
+        flash("You must be logged in to access this page", 'danger')
+
+        return redirect('/')
+
+
 @app.route("/recipe/<int:id>/similar")    
 def similar_recipes(id):
     searchRecipes = []
@@ -413,6 +472,92 @@ def save_recipe(id):
     else: 
         session["saveRecipe"] = ID
         flash("Log in or Create an Account to save this recipe!", 'danger')
+        return redirect("/login")
+
+
+@app.route("/users/<int:user_id>/created-recipe/<int:id>/edit", methods=["GET", "POST"])
+def edit_created_recipe(user_id, id):
+    if CURR_USER_KEY in session:
+        recipe = CreatedRecipe.query.get_or_404(id)
+        user = User.query.get_or_404(user_id)
+        analysisIngr = []
+
+        form = CreateRecipeForm(obj=recipe)
+
+        if form.validate_on_submit():
+            recipe.title = form.title.data
+            recipe.servings = form.servings.data
+            recipe.cooking_time = form.cooking_time.data
+            recipe.summary = form.summary.data
+            recipe.weight_watchers_pts = form.weight_watchers_pts.data
+            image = form.image.data
+            filename = secure_filename(image.filename)
+            if filename:
+                image.save(os.path.join("static", 'images', filename))
+                recipe.image = image.filename
+            else:
+                recipe.image
+
+            if '[' in form.ingredients.data:
+                print('running as list')
+                analysisIngr = ast.literal_eval(form.ingredients.data)
+            else:
+                print('running as string')
+                analysisIngr = form.ingredients.data.split(',\r\n')
+               
+            recDir = form.directions.data
+
+            if recipe.ingredients != analysisIngr:
+                print('recalling edamam api for updated recipe')
+                recipeUpdate = {
+                "title": form.title.data,
+                "yield": form.servings.data,
+                "ingr": analysisIngr
+                }
+
+                recipeAnalysis = requests.post(f"{EDAMAM_URL}?app_id={EDAMAM_APP_ID}&app_key={EDAMAM_APP_KEY}",  data = json.dumps(recipeUpdate), headers = {"Content-Type": "application/json", "Accept": "application/json"})
+
+                analysisRes = recipeAnalysis.json()
+            
+                healthLabels = analysisRes["healthLabels"] + analysisRes["dietLabels"]
+            
+                recipe.calories=analysisRes["calories"] 
+                recipe.healthLabels=healthLabels
+                recipe.fat=analysisRes["totalNutrients"]["FAT"]["quantity"]
+                recipe.sat_fat=analysisRes["totalNutrients"]["FASAT"]["quantity"]
+                recipe.trans_fat=analysisRes["totalNutrients"]["FATRN"]["quantity"]
+                recipe.poly_fat=analysisRes["totalNutrients"]["FAPU"]["quantity"]
+                recipe.mono_fat=analysisRes["totalNutrients"]["FAMS"]["quantity"]
+                recipe.carbs=analysisRes["totalNutrients"]["CHOCDF"]["quantity"]
+                recipe.fiber=analysisRes["totalNutrients"]["FIBTG"]["quantity"]
+                recipe.sugar=analysisRes["totalNutrients"]["SUGAR"]["quantity"]
+                recipe.protein=analysisRes["totalNutrients"]["PROCNT"]["quantity"]
+                recipe.cholesterol=analysisRes["totalNutrients"]["CHOLE"]["quantity"]
+                recipe.sodium=analysisRes["totalNutrients"]["NA"]["quantity"]
+                recipe.vit_D=analysisRes["totalDaily"]["VITD"]["quantity"]
+                recipe.calcium=analysisRes["totalDaily"]["CA"]["quantity"]
+                recipe.iron=analysisRes["totalDaily"]["FE"]["quantity"]
+                recipe.potassium=analysisRes["totalDaily"]["K"]["quantity"]
+                recipe.vit_A=analysisRes["totalDaily"]["VITA_RAE"]["quantity"]
+                recipe.vit_C=analysisRes["totalDaily"]["VITC"]["quantity"]
+
+            recipe.ingredients = analysisIngr
+            recipe.directions = recDir
+                
+            db.session.commit()
+
+            if "created_recipes" in session:
+                del session["created_recipes"]
+
+            flash("You successfully edited this recipe", 'success')
+
+            return redirect(f"/users/{user_id}/created-recipe/{id}")
+        
+        return render_template("users/edit_recipe.html", user=user, form=form)
+
+       
+    else: 
+        flash("You must be logged in to edit this recipe!", 'danger')
         return redirect("/login") 
 
 
@@ -436,6 +581,24 @@ def delete_recipe(id):
         flash("You must be logged in to do this!", 'danger')
         return redirect("/login") 
 
+@app.route("/users/<int:user_id>/created-recipe/<int:id>/delete")
+def delete_created_recipe(user_id, id):
+    if "curr_user" in session:
+        userId= user_id
+        faveRecipe = FaveCreatedRecipes.query.filter(FaveCreatedRecipes.user_id == userId, FaveCreatedRecipes.recipes_id == id).delete()
+        createdRecipe = CreatedRecipe.query.filter_by(id=id).delete()
+
+        db.session.commit()
+
+        if 'created_recipes' in session:
+            del session["created_recipes"]
+
+        flash("You successfully deleted this recipe from your library", 'success')
+
+        return redirect("/")
+    else: 
+        flash("You must be logged in to do this!", 'danger')
+        return redirect("/login") 
 
 @app.route("/recipe/<recipe_id>/editLibraryTags", methods=["POST"])
 def recipe_tags(recipe_id):
@@ -510,6 +673,80 @@ def recipe_tags(recipe_id):
             
     return redirect(f"/users/{user.id}/hub")
 
+@app.route("/users/<int:user_id>/created-recipe/<int:recipe_id>/editLibraryTags", methods=["POST"])
+def recipe_tags_created_recipes(user_id, recipe_id):
+    if CURR_USER_KEY in session or "curr_user" in session:
+        user = User.query.get_or_404(user_id)
+        createdRecipe = CreatedRecipe.query.get_or_404(recipe_id)
+        currentCreatedRecipeCuisines = UserCreatedRecipesCuisine.query.filter(UserCreatedRecipesCuisine.user_id == user.id, UserCreatedRecipesCuisine.recipe_id == createdRecipe.id).all()
+        currentCreatedRecipeDiets = UserCreatedRecipesDiet.query.filter(UserCreatedRecipesDiet.user_id == user.id, UserCreatedRecipesDiet.recipe_id == createdRecipe.id).all()
+        currentCreatedRecipeCustomTags = UserCreatedRecipesCustom.query.filter(UserCreatedRecipesCustom.user_id == user.id, UserCreatedRecipesCustom.recipe_id == createdRecipe.id).all()
+
+        cuisineIDs = []
+        dietIDs = []
+        customIDs = []
+
+        for item in currentCreatedRecipeCuisines:
+            cuisineIDs.append(item.cuisine_id)
+
+        for item in currentCreatedRecipeDiets:
+            dietIDs.append(item.diet_id)
+
+        for item in currentCreatedRecipeCustomTags:
+            customIDs.append(item.custom_id)
+
+        form = UserEditForm()
+
+        cuisines = db.session.query(Cuisine.id, Cuisine.name)
+        diets = db.session.query(Diet.id, Diet.name)
+        displayCustoms = db.session.query(CustomTag.id, CustomTag.name)
+
+
+        form.fave_cuisines.choices = cuisines
+        form.diets.choices = diets
+        form.displayCustoms.choices = displayCustoms
+
+        if form.is_submitted():
+
+            recipe_cuisine_tags = form.fave_cuisines.data
+            recipe_diet_tags = form.diets.data
+            recipe_custom_tags = form.displayCustoms.data
+ 
+            for cuisine in cuisineIDs:
+                if cuisine not in recipe_cuisine_tags:
+                    deleted = UserCreatedRecipesCuisine.query.filter(UserCreatedRecipesCuisine.cuisine_id==cuisine, UserCreatedRecipesCuisine.user_id==user.id, UserCreatedRecipesCuisine.recipe_id==recipe_id).delete()
+
+            for cuisine in recipe_cuisine_tags:
+                if cuisine not in cuisineIDs:
+                    newCuisine = UserCreatedRecipesCuisine(user_id=user.id, recipe_id=recipe_id, cuisine_id=cuisine)
+                    db.session.add(newCuisine)
+
+            for diet in dietIDs:
+                if diet not in recipe_diet_tags:
+                    deleted = UserCreatedRecipesDiet.query.filter(UserCreatedRecipesDiet.diet_id==diet, UserCreatedRecipesDiet.user_id==user.id, UserCreatedRecipesDiet.recipe_id==recipe_id).delete()
+
+            for diet in recipe_diet_tags:
+                if diet not in dietIDs:
+                    newDiet = UserCreatedRecipesDiet(user_id=user.id, recipe_id=recipe_id, diet_id=diet)
+                    db.session.add(newDiet)
+
+            for tag in customIDs:
+                if tag not in recipe_custom_tags:
+                    deleted = UserCreatedRecipesCustom.query.filter(UserCreatedRecipesCustom.custom_id==tag, UserCreatedRecipesCustom.user_id==user.id, UserCreatedRecipesCustom.recipe_id==recipe_id).delete()
+
+            for tag in recipe_custom_tags:
+                if tag not in customIDs:
+                    newCustom = UserCreatedRecipesCustom(user_id=user.id, recipe_id=recipe_id, custom_id=tag)
+                    db.session.add(newCustom)       
+
+            db.session.commit()
+ 
+            flash("You successfully picked your food preferences", "success")
+            return redirect(f"/users/{user.id}/hub")
+            
+    return redirect(f"/users/{user.id}/hub")
+
+
 @app.route("/recipe/<recipe_id>/newTag")
 def create_new_tags(recipe_id):
     user = User.query.get_or_404(session["curr_user"])
@@ -529,6 +766,24 @@ def create_new_tags(recipe_id):
 
     return redirect(f"/recipe/{recipe_id}#editLibraryTags")
 
+@app.route("/users/<int:user_id>/created-recipe/<int:recipe_id>/newTag")
+def create_new_tags_created_recipe(recipe_id):
+    user = User.query.get_or_404(user_id)
+    recipe = CreatedRecipe.query.filter_by(id=recipe_id).all()
+    newTagRequest = request.args.get("newCustomTag")
+
+    newTag = CustomTag(name=newTagRequest)
+    db.session.add(newTag)
+    db.session.commit()
+
+    currentTag = CustomTag.query.filter_by(name=newTagRequest).all()
+    userTag = UserCustomTags(user_id=user.id, custom_id=currentTag[0].id)
+    userRecipeTag = UserCreatedRecipesCustom(user_id=user.id, recipe_id=recipe[0].id, custom_id=currentTag[0].id)
+    db.session.add(userTag)
+    db.session.add(userRecipeTag)
+    db.session.commit()
+
+    return redirect(f"/users/{user_id}/created-recipe/{recipe_id}#editLibraryTags")
 
 
 @app.route('/users/<int:user_id>/hub')
@@ -542,12 +797,16 @@ def user_hub(user_id):
         created_recipes = user.created_recipes
         recipeLinkedCuisines = UserSavedRecipesCuisine.query.filter(UserSavedRecipesCuisine.user_id==user.id).all()
         recipeLinkedDiets = UserSavedRecipesDiet.query.filter(UserSavedRecipesDiet.user_id==user.id).all()
+        createdRecipeLinkedCuisines = UserCreatedRecipesCuisine.query.filter(UserCreatedRecipesCuisine.user_id==user.id).all()
+        createdRecipeLinkedDiets = UserCreatedRecipesDiet.query.filter(UserCreatedRecipesDiet.user_id==user.id).all()
 
         savedRecipes = []
+        createdRecipes = []
 
         page["page"] = 1
 
         DBSavedRecipes = saved_recipes
+        DBCreatedRecipes = created_recipes
 
         if not 'saved_recipes' in session:
             print('calling api for saved recipes')
@@ -565,7 +824,18 @@ def user_hub(user_id):
             print('calling session for saved recipes')
             savedRecipes = session['saved_recipes']
 
-        return render_template("users/user_hub.html", user=user, savedRecipes=savedRecipes, page=page, DBSavedRecipes=DBSavedRecipes, recipeLinkedCuisines=recipeLinkedCuisines, recipeLinkedDiets=recipeLinkedDiets)
+        if not 'created_recipes' in session:
+            print('calling db for created recipes')
+            for item in created_recipes:
+                createdRecipes.append(item)
+
+            session['created_recipes'] = createdRecipes
+
+        elif 'created_recipes' in session:
+            print('calling session for created recipes')
+            createdRecipes = session['created_recipes']
+
+        return render_template("users/user_hub.html", user=user, createdRecipes=createdRecipes, savedRecipes=savedRecipes, page=page, DBSavedRecipes=DBSavedRecipes, DBCreatedRecipes=DBCreatedRecipes, recipeLinkedCuisines=recipeLinkedCuisines, recipeLinkedDiets=recipeLinkedDiets, createdRecipeLinkedCuisines=createdRecipeLinkedCuisines, createdRecipeLinkedDiets=createdRecipeLinkedDiets)
 
     else:
         flash("You must be logged in to access this page", 'danger')
@@ -598,7 +868,6 @@ def user_pref_form(user_id):
         form.intolerances.data = [(c.intolerances_id) for c in exisitingFoodIntolerances ]
             
         return render_template("users/user_pref_form.html", user=user, form=form)
-
 
 
 @app.route('/users/<int:user_id>/preferences/edit', methods=["POST"])
@@ -695,6 +964,7 @@ def user_library(user_id):
         created_recipes = user.created_recipes
 
         DBSavedRecipes = saved_recipes
+        DBCreatedRecipes = created_recipes
 
         if not 'saved_recipes' in session:
             print('calling api for saved recipes')
@@ -712,7 +982,18 @@ def user_library(user_id):
             print('calling session for saved recipes')
             savedRecipes = session['saved_recipes']
 
-        return render_template("users/library.html", user=user, savedRecipes=savedRecipes, DBSavedRecipes=DBSavedRecipes, page=page)
+        if not 'created_recipes' in session:
+            print('calling api for created recipes')
+            for item in created_recipes:
+                createdRecipes.append(item)
+
+            session['created_recipes'] = createdRecipes
+
+        elif 'created_recipes' in session:
+            print('calling session for created recipes')
+            createdRecipes = session['created_recipes']
+
+        return render_template("users/library.html", user=user, savedRecipes=savedRecipes, createdRecipes=createdRecipes, DBSavedRecipes=DBSavedRecipes, DBCreatedRecipes=DBCreatedRecipes, page=page)
     else:
         flash("You must be logged in to access this page", 'danger')
 
@@ -729,3 +1010,199 @@ def user_library_sort(user_id):
     customsRequest = request.args.getlist("customs")
 
     return render_template("users/library.html", user=user, savedRecipes=savedRecipes, DBSavedRecipes=DBSavedRecipes, page=page)
+
+
+@app.route('/create-recipe', methods=['GET', 'POST'])
+def create_recipe():
+    if CURR_USER_KEY in session or "curr_user" in session:
+
+        recipeArr = []
+        user_id = session["curr_user"]
+        user = User.query.get_or_404(user_id)
+
+        form = CreateRecipeForm()
+
+        if form.validate_on_submit():
+            title = form.title.data
+            servings = form.servings.data
+            cooking_time = form.cooking_time.data
+            summary = form.summary.data
+            weight_watchers_pts = form.weight_watchers_pts.data
+            image = form.image.data
+            directions = form.directions.data
+            filename = secure_filename(image.filename)
+            if filename:
+                image.save(os.path.join("static", 'images', filename))
+
+            analysisIngr = form.ingredients.data.split(',\r\n')
+            ingredients = analysisIngr
+
+            recipe = {
+                "title": form.title.data,
+                "yield": form.servings.data,
+                "ingr": analysisIngr
+            }
+
+            recipeAnalysis = requests.post(f"{EDAMAM_URL}?app_id={EDAMAM_APP_ID}&app_key={EDAMAM_APP_KEY}",  data = json.dumps(recipe), headers = {"Content-Type": "application/json", "Accept": "application/json"})
+
+            analysisRes = recipeAnalysis.json()
+            
+            healthLabels = analysisRes["healthLabels"] + analysisRes["dietLabels"]
+
+            source = f"{user.first_name} {user.last_name}"
+
+            new_recipe = CreatedRecipe(title=title, source=source, directions=directions, ingredients=ingredients, servings=servings, cooking_time=cooking_time, summary=summary, weight_watchers_pts=weight_watchers_pts, image=image.filename, calories=analysisRes["calories"], healthLabels=healthLabels, fat=analysisRes["totalNutrients"]["FAT"]["quantity"], sat_fat=analysisRes["totalNutrients"]["FASAT"]["quantity"], trans_fat=analysisRes["totalNutrients"]["FATRN"]["quantity"], poly_fat=analysisRes["totalNutrients"]["FAPU"]["quantity"], mono_fat=analysisRes["totalNutrients"]["FAMS"]["quantity"], carbs=analysisRes["totalNutrients"]["CHOCDF"]["quantity"], fiber=analysisRes["totalNutrients"]["FIBTG"]["quantity"], sugar=analysisRes["totalNutrients"]["SUGAR"]["quantity"], protein=analysisRes["totalNutrients"]["PROCNT"]["quantity"], cholesterol=analysisRes["totalNutrients"]["CHOLE"]["quantity"], sodium=analysisRes["totalNutrients"]["NA"]["quantity"], vit_D=analysisRes["totalDaily"]["VITD"]["quantity"], calcium=analysisRes["totalDaily"]["CA"]["quantity"], iron=analysisRes["totalDaily"]["FE"]["quantity"], potassium=analysisRes["totalDaily"]["K"]["quantity"], vit_A=analysisRes["totalDaily"]["VITA_RAE"]["quantity"], vit_C=analysisRes["totalDaily"]["VITC"]["quantity"])
+
+            db.session.add(new_recipe)
+
+            db.session.commit()
+
+            helper = FaveCreatedRecipes(user_id=user_id, recipes_id=new_recipe.id)
+            
+            db.session.add(helper)
+
+            db.session.commit()
+
+            recipeArr.append(new_recipe)
+
+            if session["created_recipes"]:
+                session["created_recipes"].append(new_recipe)
+            else:
+                session["created_recipes"] = recipeArr
+        
+            return redirect(f'users/{user_id}/created-recipe/{new_recipe.id}')
+
+        return render_template("users/create_recipe.html", user=user, form=form)
+
+    else:
+        flash("You must be logged in to access this page", 'danger')
+
+        return redirect('/login')
+
+@app.route('/extract-recipe', methods=["GET", "POST"])
+def extract_recipe():
+    if "curr_user" in session:
+        searchArgs = request.args.get("search")
+        savedArgs = request.args.get("saved")
+        user_id = session["curr_user"]
+        user = User.query.get_or_404(user_id)
+        recipeArr = []
+        finalRecipe = {}
+
+        if not savedArgs and searchArgs:
+            print('about to extract')
+            extracted_recipe = scrape_me(searchArgs,  wild_mode=True)
+
+            title = extracted_recipe.title()
+            total_time = extracted_recipe.total_time()
+            yields_servings = extracted_recipe.yields()
+            ingredients = extracted_recipe.ingredients()
+            instructions = extracted_recipe.instructions()
+            image = extracted_recipe.image()
+            source = extracted_recipe.host()
+            links = extracted_recipe.links()
+
+            print(type(instructions))
+            yields = yields_servings.split(' ')[0]
+
+            getRecNutrition = {
+                "title": title,
+                "yield": yields,
+                "ingr": ingredients
+            }
+
+            recipeAnalysis = requests.post(f"{EDAMAM_URL}?app_id={EDAMAM_APP_ID}&app_key={EDAMAM_APP_KEY}",  data = json.dumps(getRecNutrition), headers = {"Content-Type": "application/json", "Accept": "application/json"})
+
+            analysisRes = recipeAnalysis.json()
+
+            healthLabels = analysisRes["healthLabels"] + analysisRes["dietLabels"]
+            calories = analysisRes["calories"] 
+            fat=analysisRes["totalNutrients"]["FAT"]["quantity"] 
+            sat_fat=analysisRes["totalNutrients"]["FASAT"]["quantity"]
+            trans_fat=analysisRes["totalNutrients"]["FATRN"]["quantity"]
+            poly_fat=analysisRes["totalNutrients"]["FAPU"]["quantity"]
+            mono_fat=analysisRes["totalNutrients"]["FAMS"]["quantity"]
+            carbs=analysisRes["totalNutrients"]["CHOCDF"]["quantity"]
+            fiber=analysisRes["totalNutrients"]["FIBTG"]["quantity"]
+            sugar=analysisRes["totalNutrients"]["SUGAR"]["quantity"]
+            protein=analysisRes["totalNutrients"]["PROCNT"]["quantity"]
+            cholesterol=analysisRes["totalNutrients"]["CHOLE"]["quantity"]
+            sodium=analysisRes["totalNutrients"]["NA"]["quantity"]
+            vit_D=analysisRes["totalDaily"]["VITD"]["quantity"]
+            calcium=analysisRes["totalDaily"]["CA"]["quantity"]
+            iron=analysisRes["totalDaily"]["FE"]["quantity"]
+            potassium=analysisRes["totalDaily"]["K"]["quantity"]
+            vit_A=analysisRes["totalDaily"]["VITA_RAE"]["quantity"]
+            vit_C=analysisRes["totalDaily"]["VITC"]["quantity"]
+            
+            recipe = {
+                "calories": calories,
+                "healthLabels": healthLabels,
+                "fat": fat,
+                "sat_fat": sat_fat,
+                "trans_fat": trans_fat,
+                "poly_fat": poly_fat,
+                "mono_fat": mono_fat,
+                "carbs": carbs,
+                "fiber": fiber,
+                "sugar": sugar,
+                "protein": protein,
+                "cholesterol": cholesterol,
+                "sodium": sodium,
+                "vit_D": vit_D,
+                "calcium": calcium,
+                "iron": iron,
+                "potassium": potassium,
+                "vit_A": vit_A,
+                "vit_C": vit_C
+            }
+
+            alltogether = {
+                "title": title,
+                "directions": instructions,
+                "ingredients": ingredients,
+                "servings": yields,
+                "cooking_time": total_time,
+                "image": image,
+                "source": source,
+                "nutrition": recipe
+            }
+            
+            session["finalRecipe"] = alltogether
+            
+            return render_template('users/extracted_rec.html', user=user, title=title, total_time=total_time, yields=yields, ingredients=ingredients, instructions=instructions, image=image, source=source, links=links, recipe=recipe)
+    
+        elif savedArgs:
+            print('about to save')
+            if 'finalRecipe' in session:
+                finalRecipe = session["finalRecipe"]
+
+                print(finalRecipe["directions"])
+                print(type(finalRecipe["directions"]))
+                
+                new_recipe = CreatedRecipe(title=finalRecipe["title"], directions=finalRecipe["directions"], ingredients=finalRecipe["ingredients"], servings=finalRecipe["servings"], cooking_time=finalRecipe["cooking_time"], image=finalRecipe["image"], calories=finalRecipe["nutrition"]["calories"], healthLabels=finalRecipe["nutrition"]["healthLabels"], fat=finalRecipe["nutrition"]["fat"], sat_fat=finalRecipe["nutrition"]["sat_fat"], trans_fat=finalRecipe["nutrition"]["trans_fat"], poly_fat=finalRecipe["nutrition"]["poly_fat"], mono_fat=finalRecipe["nutrition"]["mono_fat"], carbs=finalRecipe["nutrition"]["carbs"], fiber=finalRecipe["nutrition"]["fiber"], sugar=finalRecipe["nutrition"]["sugar"], protein=finalRecipe["nutrition"]["protein"], cholesterol=finalRecipe["nutrition"]["cholesterol"], sodium=finalRecipe["nutrition"]["sodium"], vit_D=finalRecipe["nutrition"]["vit_D"], calcium=finalRecipe["nutrition"]["calcium"], iron=finalRecipe["nutrition"]["iron"], potassium=finalRecipe["nutrition"]["potassium"], vit_A=finalRecipe["nutrition"]["vit_A"], vit_C=finalRecipe["nutrition"]["vit_C"])
+                
+                db.session.add(new_recipe)
+
+                db.session.commit()
+
+                helper = FaveCreatedRecipes(user_id=user_id, recipes_id=new_recipe.id)
+                
+                db.session.add(helper)
+
+                db.session.commit()
+
+                recipeArr.append(new_recipe)
+
+                if session["created_recipes"]:
+                    session["created_recipes"].append(new_recipe)
+                else:
+                    session["created_recipes"] = recipeArr
+            
+                return redirect(f'users/{user_id}/created-recipe/{new_recipe.id}')
+
+        return render_template('extract.html')
+
+    else:
+        return redirect('/login')
+

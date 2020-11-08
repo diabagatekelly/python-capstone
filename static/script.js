@@ -41,6 +41,8 @@ $('input[type=checkbox]').on('change', () => {
       cuisineTagList = card.firstElementChild.children[1].children[0].children[2].children
       dietTagList = card.firstElementChild.children[1].children[0].children[3].children
       customTagList = card.firstElementChild.children[1].children[0].children[4].children
+      source = card.firstElementChild.id
+      console.log(source)
      for (span of cuisineTagList) {
        tagArray.push(span.className)
      }
@@ -50,6 +52,8 @@ $('input[type=checkbox]').on('change', () => {
     for (span of customTagList) {
       tagArray.push(span.className)
     }
+    tagArray.push(source)
+    
      for (tag of tagArray) {
       if (checkedArray.includes(tag)) {
         show = true

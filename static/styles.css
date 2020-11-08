@@ -373,3 +373,12 @@ footer {
 #all_recipes {
     width: 100%
 }
+
+
+form#create-recipe textarea {
+    height: 10em;
+}
+
+.badge {
+    margin: 1em 0 3em
+}

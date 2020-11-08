@@ -15,7 +15,8 @@
   <div class="row align-items-top user_hub">
     <div class="col-2">
       <div class="nav flex-column nav-tabs" id="user-hub-tab" role="tablist" aria-orientation="vertical">
-        <a class="nav-link active" id="recently-saved-tab" data-toggle="tab" href="#recently-saved" role="tab" aria-controls="recently-saved" aria-selected="true">Recently Saved</a>
+        <a class="nav-link active" id="recently-saved-tab" data-toggle="tab" href="#recently-saved" role="tab" aria-controls="recently-saved" aria-selected="true">Recently Saved/Created</a>
+        <a class="nav-link"  href="/create-recipe" role="tab" aria-controls="create-recipe" aria-selected="false">Create Recipe</a>
         <a class="nav-link" href="/users/{{user.id}}/preferences" role="tab" aria-controls="edit-prefs" aria-selected="false">Edit Search Preferences</a>
         <a class="nav-link" href="/users/{{user.id}}/library" role="tab" aria-controls="library" aria-selected="false">View Full Library</a>
       </div>
@@ -164,11 +165,164 @@
             </div>
             {% endfor %}
             {%endif%}
+          </div>
+
+          <div class="row d-flex">
+            <div class="col-12">
+              <h2 class="text-left mt-5">Recently Created Recipes</h2>
+            </div>
+            {% if createdRecipes|length > 5 %}  
+            {% for item in createdRecipes[createdRecipes|length-1: createdRecipes|length-6:-1] %}
+            <div class="col-12 col-md-4">
+              <div class="card" style="width: 15rem; margin: 1rem auto">
+                <div class="img-container">
+                  {% if 'http' in item.image %}
+                  <img class="card-img-top" src={{item.image}} alt="Card image cap">
+                  {% else %}
+                  <img class="card-img-top" src="/static/images/{{item.image}}" alt="Card image cap">
+                  {% endif %}
+                    <div class="overlay minus text-center">
+                        <a href="/users/{{user.id}}/created-recipe/{{item.id}}/delete"><i data-toggle="tooltip" data-placement="top" title="Delete from library" class="fa fa-minus-circle"></i></a>
+                    </div>
+                </div>                      
+                <div class="home card-body loggedUser">
+                  <div class="header">
+                    <h6 class="text-center">{{item.title}}</h6>
+                  
+                 <hr/>
+                 
+                      {% for rec in DBCreatedRecipes %}
+
+
+                      {% if rec.id == item.id and rec.created_recipes_linked_cuisine %}
+                      <p class="text-left"><b><i>Library Tags - Cuisines:</i></b>  
+                        {% for r in rec.created_recipes_linked_cuisine %}
+                          <span><i>{{r.name}},</i></span>
+                        {% endfor %}
+                      </p>
+                      {% elif rec.id == item.id and not rec.created_recipes_linked_cuisine %}
+                      <p class="text-left"><b><i>Library Tags - Cuisines:</i></b>  
+                        <span><i>None</i></span>
+                      </p>
+                      {% endif %}
+                  
+                      {% if rec.id == item.id and rec.created_recipes_linked_diet %}
+                      <p class="text-left"><b><i>Library Tags - Diets:</i></b>  
+                        {% for d in rec.created_recipes_linked_diet %}
+                          <span><i>{{d.name}},</i></span>
+                        {% endfor %}
+                      </p>
+                      {% elif rec.id == item.id and not rec.created_recipes_linked_diet %}
+                      <p class="text-left"><b><i>Library Tags - Diets:</i></b>  
+                        <span><i>None</i></span>
+                      </p>
+                      {% endif %}
+
+                      {% if rec.id == item.id and rec.created_recipes_linked_custom %}
+                      <p class="text-left"><b><i>Library Tags - Custom Tags:</i></b>  
+                        {% for t in rec.created_recipes_linked_custom %}
+                          <span><i>{{t.name}},</i></span>
+                        {% endfor %}
+                      </p>
+                      {% elif rec.id == item.id and not rec.created_recipes_linked_custom %}
+                      <p class="text-left"><b><i>Library Tags - Custom Tags:</i></b>  
+                        <span><i>None</i></span>
+                      </p>
+                      {% endif %}
+
+                    {% endfor %}
+                
+                  </div>
+                
+                    <hr/>
+                    <a href="/users/{{user.id}}/created-recipe/{{item.id}}"><p>View recipe details</p></a>                           
+                    <a href="/users/{{user.id}}/created-recipe/{{item.id}}#editLibraryTags"><p>Edit Library Tags</p></a>
+      
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+             {% else %}
+            {% for item in createdRecipes[createdRecipes|length-1: :-1] %} 
+            <div class="col-12 col-md-3">
+              <div class="card" style="width: 15rem; margin: 1rem auto">
+                <div class="img-container">
+                  {% if 'http' in item.image %}
+                  <img class="card-img-top" src={{item.image}} alt="Card image cap">
+                  {% else %}
+                  <img class="card-img-top" src="/static/images/{{item.image}}" alt="Card image cap">
+                  {% endif %}
+                    <div class="overlay minus text-center">
+                        <a href="/users/{{user.id}}/created-recipe/{{item.id}}/delete"><i data-toggle="tooltip" data-placement="top" title="Delete from library" class="fa fa-minus-circle"></i></a>
+                    </div>
+                </div>                      
+                <div class="home card-body loggedUser">
+                  <div class="header">
+                    <h6 class="text-center">{{item.title}}</h6>
+                  
+                 <hr/>
+                 
+                      {% for rec in DBCreatedRecipes %}
+
+
+                      {% if rec.id == item.id and rec.created_recipes_linked_cuisine %}
+                      <p class="text-left"><b><i>Library Tags - Cuisines:</i></b>  
+                        {% for r in rec.created_recipes_linked_cuisine %}
+                          <span><i>{{r.name}},</i></span>
+                        {% endfor %}
+                      </p>
+                      {% elif rec.id == item.id and not rec.created_recipes_linked_cuisine %}
+                      <p class="text-left"><b><i>Library Tags - Cuisines:</i></b>  
+                        <span><i>None</i></span>
+                      </p>
+                      {% endif %}
+                  
+                      {% if rec.id == item.id and rec.created_recipes_linked_diet %}
+                      <p class="text-left"><b><i>Library Tags - Diets:</i></b>  
+                        {% for d in rec.created_recipes_linked_diet %}
+                          <span><i>{{d.name}},</i></span>
+                        {% endfor %}
+                      </p>
+                      {% elif rec.id == item.id and not rec.created_recipes_linked_diet %}
+                      <p class="text-left"><b><i>Library Tags - Diets:</i></b>  
+                        <span><i>None</i></span>
+                      </p>
+                      {% endif %}
+
+                      {% if rec.id == item.id and rec.created_recipes_linked_custom %}
+                      <p class="text-left"><b><i>Library Tags - Custom Tags:</i></b>  
+                        {% for t in rec.created_recipes_linked_custom %}
+                          <span><i>{{t.name}},</i></span>
+                        {% endfor %}
+                      </p>
+                      {% elif rec.id == item.id and not rec.created_recipes_linked_custom %}
+                      <p class="text-left"><b><i>Library Tags - Custom Tags:</i></b>  
+                        <span><i>None</i></span>
+                      </p>
+                      {% endif %}
+
+                    {% endfor %}
+                
+                  </div>
+                
+                    <hr/>
+                    <a href="/users/{{user.id}}/created-recipe/{{item.id}}"><p>View recipe details</p></a>                           
+                    <a href="/users/{{user.id}}/created-recipe/{{item.id}}#editLibraryTags"><p>Edit Library Tags</p></a>
+      
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+            {%endif%}
            
       
           </div>
+
+
+
+
+
         </div>
-    
       </div>
     </div>
   <div class="col-10">

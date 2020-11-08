@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, SelectMultipleField, widgets
+from wtforms import StringField, PasswordField, TextAreaField, SelectMultipleField, FileField, widgets
 from wtforms.validators import DataRequired, Email, Length, Optional
 
 class UserAddForm(FlaskForm):
@@ -32,6 +32,25 @@ class UserEditForm(FlaskForm):
     diets = MultiCheckboxField("Special Diets (Optional)", coerce=int, validators=[Optional()])
     intolerances = MultiCheckboxField("Foods to avoid (Optional)", coerce=int, validators=[Optional()])
     displayCustoms = MultiCheckboxField("Custom (Optional)", coerce=int, validators=[Optional()])
+
+class CreateRecipeForm(FlaskForm):
+    """Form for creating new recipe"""
+    
+    title = StringField('Title (required)', render_kw={"placeholder":"Baked Chicken"}, validators=[DataRequired()])
+    directions = TextAreaField('Directions (required)', render_kw={"placeholder":
+    """Write/paste directions:
+    Turn on oven to 375F.Then, rinse the chicken"""}, validators=[DataRequired()])
+    ingredients = TextAreaField('Ingredients (required)', render_kw={"placeholder":
+    """Add/paste one ingredient per line, separated by commas
+    Example: 
+    1lb chicken,
+    Pan oil
+    """}, validators=[DataRequired()])
+    servings = StringField('Servings (required)', render_kw={"placeholder":"8"}, validators=[DataRequired()])
+    cooking_time = StringField('Cooking Time (optional)', render_kw={"placeholder":"30 min"}, validators=[Optional()])
+    summary = TextAreaField('Summary (optional)', render_kw={"placeholder":"Delicious, quick and healthy chicken recipe the whole family is sure to enjoy."}, validators=[Optional()])
+    weight_watchers_pts = StringField('Weight Watchers Points (optional)', render_kw={"placeholder":"12"}, validators=[Optional()])
+    image = FileField('Image (optional)', render_kw={"placeholder":"Upload image"})
 
 
 class LoginForm(FlaskForm):
