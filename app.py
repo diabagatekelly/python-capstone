@@ -11,7 +11,7 @@ import requests
 import os
 import re
 import ast
-# from keys import Keys
+from keys import Keys
 from recipe_scrapers import scrape_me
 
 
@@ -23,14 +23,14 @@ OFFSET = 0
 SPOONACULAR_RECIPES_URL = "https://api.spoonacular.com/recipes"
 EDAMAM_URL = "https://api.edamam.com/api/nutrition-details"
 
-APIKEY = os.environ.get('APIKEY')
-# APIKEY = os.environ.get('APIKEY', Keys.spoonacular_api_key)
+# APIKEY = os.environ.get('APIKEY')
+APIKEY = os.environ.get('APIKEY', Keys.spoonacular_api_key)
 
-EDAMAM_APP_ID = os.environ.get('EDAMAM_APP_ID')
-# EDAMAM_APP_ID = os.environ.get('EDAMAM_APP_ID', Keys.edamam_app_id)
+# EDAMAM_APP_ID = os.environ.get('EDAMAM_APP_ID')
+EDAMAM_APP_ID = os.environ.get('EDAMAM_APP_ID', Keys.edamam_app_id)
 
-EDAMAM_APP_KEY = os.environ.get('EDAMAM_APP_KEY')
-# EDAMAM_APP_KEY = os.environ.get('EDAMAM_APP_KEY', Keys.edamam_app_key)
+# EDAMAM_APP_KEY = os.environ.get('EDAMAM_APP_KEY')
+EDAMAM_APP_KEY = os.environ.get('EDAMAM_APP_KEY', Keys.edamam_app_key)
 
 app = Flask(__name__)
 
@@ -46,6 +46,7 @@ connect_db(app)
 
 sess = Session()
 sess.init_app(app)
+
 
 @app.before_request
 def make_session_permanent():
