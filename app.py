@@ -23,6 +23,8 @@ OFFSET = 0
 SPOONACULAR_RECIPES_URL = "https://api.spoonacular.com/recipes"
 EDAMAM_URL = "https://api.edamam.com/api/nutrition-details"
 
+x=test
+
 APIKEY = os.environ.get('APIKEY')
 # APIKEY = os.environ.get('APIKEY', Keys.spoonacular_api_key)
 
