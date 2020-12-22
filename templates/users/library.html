@@ -113,7 +113,7 @@
                    {% if item.sourceName %}
                         {% for rec in DBSavedRecipes %}
                         {% if rec.api_id == item.id and rec.saved_recipes_linked_cuisine %}
-                        <p class="library_cuisine_tags text-left"><b><i>Library Tags - Cuisines:</i></b>  
+                        <p class="library_cuisine_tags text-left span-results-list"><b><i>Library Tags - Cuisines:</i></b>  
                           {% for r in rec.saved_recipes_linked_cuisine %}
                             <span class="{{r.name}}"><i>{{r.name}},</i></span>
                           {% endfor %}
@@ -125,7 +125,7 @@
                         {% endif %}
                      
                         {% if rec.api_id == item.id and rec.saved_recipes_linked_diet %}
-                        <p class="library_diet_tags text-left"><b><i>Library Tags - Diets:</i></b>  
+                        <p class="library_diet_tags text-left span-results-list"><b><i>Library Tags - Diets:</i></b>  
                           {% for d in rec.saved_recipes_linked_diet %}
                             <span class="{{d.name}}"><i>{{d.name}},</i></span>
                           {% endfor %}
@@ -137,7 +137,7 @@
                         {% endif %}
   
                         {% if rec.api_id == item.id and rec.saved_recipes_linked_custom %}
-                        <p class="library_custom_tags text-left"><b><i>Library Tags - Custom Tags:</i></b>  
+                        <p class="library_custom_tags text-left span-results-list"><b><i>Library Tags - Custom Tags:</i></b>  
                           {% for t in rec.saved_recipes_linked_custom %}
                             <span class="{{t.name}}"><i>{{t.name}},</i></span>
                           {% endfor %}
@@ -152,7 +152,7 @@
                       {% else %}
                       {% for rec in DBCreatedRecipes %}
                       {% if rec.id == item.id and rec.created_recipes_linked_cuisine %}
-                      <p class="library_cuisine_tags text-left"><b><i>Library Tags - Cuisines:</i></b>  
+                      <p class="library_cuisine_tags text-left span-results-list"><b><i>Library Tags - Cuisines:</i></b>  
                         {% for r in rec.created_recipes_linked_cuisine %}
                           <span class="{{r.name}}"><i>{{r.name}},</i></span>
                         {% endfor %}
@@ -164,7 +164,7 @@
                       {% endif %}
                    
                       {% if rec.id == item.id and rec.created_recipes_linked_diet %}
-                      <p class="library_diet_tags text-left"><b><i>Library Tags - Diets:</i></b>  
+                      <p class="library_diet_tags text-left span-results-list"><b><i>Library Tags - Diets:</i></b>  
                         {% for d in rec.created_recipes_linked_diet %}
                           <span class="{{d.name}}"><i>{{d.name}},</i></span>
                         {% endfor %}
@@ -176,7 +176,7 @@
                       {% endif %}
 
                       {% if rec.id == item.id and rec.created_recipes_linked_custom %}
-                      <p class="library_custom_tags text-left"><b><i>Library Tags - Custom Tags:</i></b>  
+                      <p class="library_custom_tags text-left span-results-list"><b><i>Library Tags - Custom Tags:</i></b>  
                         {% for t in rec.created_recipes_linked_custom %}
                           <span class="{{t.name}}"><i>{{t.name}},</i></span>
                         {% endfor %}

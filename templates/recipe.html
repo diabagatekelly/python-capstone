@@ -93,7 +93,7 @@
             {% if helperRecipes|length > 0 and recipe.id == helperRecipes[0].api_id %}
 <hr/>          
             {% if helperRecipes[0].saved_recipes_linked_cuisine %}
-            <p class="text-left"><b><i>Library Tags - Cuisines:</i></b>  
+            <p class="text-left span-results-list"><b><i>Library Tags - Cuisines:</i></b>  
               {% for r in helperRecipes[0].saved_recipes_linked_cuisine %}
                 <span><i>{{r.name}},</i></span>
               {% endfor %}
@@ -105,7 +105,7 @@
             {% endif %}
          
             {% if helperRecipes[0].saved_recipes_linked_diet %}
-            <p class="text-left"><b><i>Library Tags - Diets:</i></b>  
+            <p class="text-left span-results-list"><b><i>Library Tags - Diets:</i></b>  
               {% for d in helperRecipes[0].saved_recipes_linked_diet %}
                 <span><i>{{d.name}},</i></span>
               {% endfor %}
@@ -117,9 +117,9 @@
             {% endif %}
 
             {% if helperRecipes[0].saved_recipes_linked_custom %}
-            <p class="text-left"><b><i>Library Tags - Custom Tags:</i></b>  
+            <p class="text-left span-results-list"><b><i>Library Tags - Custom Tags:</i></b>  
               {% for t in helperRecipes[0].saved_recipes_linked_custom %}
-                <span><i>{{t.name}},</i></span>
+                <span><i class="">{{t.name}},</i></span>
               {% endfor %}
             </p>
             {% else %}

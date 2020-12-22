@@ -11,7 +11,7 @@ import requests
 import os
 import re
 import ast
-from keys import Keys
+# from keys import Keys
 from recipe_scrapers import scrape_me
 
 
@@ -23,14 +23,14 @@ OFFSET = 0
 SPOONACULAR_RECIPES_URL = "https://api.spoonacular.com/recipes"
 EDAMAM_URL = "https://api.edamam.com/api/nutrition-details"
 
-# APIKEY = os.environ.get('APIKEY')
-APIKEY = os.environ.get('APIKEY', Keys.spoonacular_api_key)
+APIKEY = os.environ.get('APIKEY')
+# APIKEY = os.environ.get('APIKEY', Keys.spoonacular_api_key)
 
-# EDAMAM_APP_ID = os.environ.get('EDAMAM_APP_ID')
-EDAMAM_APP_ID = os.environ.get('EDAMAM_APP_ID', Keys.edamam_app_id)
+EDAMAM_APP_ID = os.environ.get('EDAMAM_APP_ID')
+# EDAMAM_APP_ID = os.environ.get('EDAMAM_APP_ID', Keys.edamam_app_id)
 
-# EDAMAM_APP_KEY = os.environ.get('EDAMAM_APP_KEY')
-EDAMAM_APP_KEY = os.environ.get('EDAMAM_APP_KEY', Keys.edamam_app_key)
+EDAMAM_APP_KEY = os.environ.get('EDAMAM_APP_KEY')
+# EDAMAM_APP_KEY = os.environ.get('EDAMAM_APP_KEY', Keys.edamam_app_key)
 
 app = Flask(__name__)
 
@@ -210,12 +210,12 @@ def home():
 
             for item in res["recipes"]:
                 recipes.append({
-                    "id": item["id"],
-                    "title": item["title"],
-                    "summary": item["summary"],
-                    "image": item["image"],
-                    "cuisines": item["cuisines"],
-                    "diets": item["diets"]
+                    "id": item.get("id"),
+                    "title": item.get("title"),
+                    "summary": item.get("summary"),
+                    "image": item.get("image"),
+                    "cuisines": item.get("cuisines"),
+                    "diets": item.get("diets")
                 })
 
                 RECIPES = recipes

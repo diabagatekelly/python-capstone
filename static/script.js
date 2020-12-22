@@ -1,3 +1,21 @@
+$(".results-list").each(function() {
+  let item = $(this)[0]
+  let itemText = item.innerText
+  let lastLetter = itemText[itemText.length-1];
+  if (lastLetter === ',') {
+    let updatedItem = itemText.slice(0, itemText.length-1);
+    $(this).text(updatedItem)
+  }
+})
+
+$(".span-results-list").each(function() {
+  let children = $(this)
+  let iEl = children[0].lastElementChild.lastElementChild
+  let text = iEl.innerHTML
+  let noCommaItem = text.slice(0, text.length-1);
+  $(iEl).text(noCommaItem)
+})
+
 $('.carousel .carousel-item').each(function() {
   var next = $(this).next();
   if (!next.length) {
@@ -105,12 +123,14 @@ str.replace(/^Summary: $/, '')
 $recipe_summary.empty()
 return $recipe_summary.append(`<b>Summary: </b> ${str}`)
 }
-str = $recipe_summary[0].innerText;
-strip_html_tags_summary(str)
+if (window.location.pathname.includes('/recipe')) {
+  str = $recipe_summary[0].innerText;
+  strip_html_tags_summary(str)
+}
 
 
 $recipe_directions = $('#recipe-directions')
-str2 = $recipe_directions[0].innerText
+
 function strip_html_tags_directions(str2) {
 if ((str2===null) || (str2===''))
   return false;
@@ -120,7 +140,10 @@ str2.replace(/<[^>]*>/g, '');
 $recipe_directions.empty();
 return $recipe_directions.append(str2)
 }
-$('#directions-tab').click(strip_html_tags_directions(str2))
+if (window.location.pathname.includes('/recipe')) {
+  str2 = $recipe_directions[0].innerText
+  $('#directions-tab').click(strip_html_tags_directions(str2))
+}
 
 
 $('#servingMeasure input').on('change', function() {
@@ -140,3 +163,6 @@ if(window.location.hash) {
 var hash = window.location.hash;
 $(hash).modal('toggle');
 }
+
+
+

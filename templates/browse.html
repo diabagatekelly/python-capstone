@@ -19,7 +19,7 @@
       </div>
       <div class="row d-flex mt-3 mb-3">
         <div class="col-12 justify-content-start">
-          <p>You searched for: {% if request.args['search']%} <b><i>{{request.args["search"]}}</i></b>{% else %} <b><i>Similar recipes</i></b>{%endif%}, sorted by: {% if request.args['cuisines'] or request.args["diets"] %}<b><i>{{request.args.getlist("cuisines")|join(', ')}}, {{request.args.getlist("diets")|join(', ')}}</i></b>{% else %}<b><i>None</i></b>{%endif%} {% if user %}, exclude {% for i in user.intolerances %}<b><i>{{i.name}},</i></b>{% endfor %} {% endif %}</p>
+          <p>You searched for: {% if request.args['search']%} <b><i class="results-list">{{request.args["search"]}}</i></b>{% else %} <b><i class="results-list">Similar recipes</i></b>{%endif%} sorted by: {% if request.args['cuisines'] or request.args["diets"] %}<b><i class="results-list">{{request.args.getlist("cuisines")|join(', ')}}, {{request.args.getlist("diets")|join(', ')}}</i></b>{% else %}<b><i class="results-list">None</i></b>{%endif%} {% if user %} exclude {% for i in user.intolerances %}<b><i class="results-list">{{i.name}},</i></b>{% endfor %} {% endif %}</p>
           <p>Results {{(page - 1)* (searchRecipes|length) + 1 }} - {% if searchRecipes|length == 20 and (searchRecipes|length)*page < totalResults %}{{(searchRecipes|length)*(page)}} {% else %} {{totalResults}}  {% endif %} of {{totalResults}}</p>
         </div>
   </div>
